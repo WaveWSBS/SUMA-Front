@@ -7,9 +7,8 @@ import { Suspense } from "react"
 import "./globals.css"
 
 export const metadata: Metadata = {
-  title: "EduFlow - Modern Learning Management System",
+  title: "Suma - AI Powered Learning Management System",
   description: "A next-generation LMS for students and educators",
-  generator: "v0.app",
 }
 
 export default function RootLayout({
