@@ -1,3 +1,144 @@
+# Suma FastAPI Backend
+
+
+A minimal viable (but considering basic security) password-based authentication backend using FastAPI + SQLite + JWT (access token) + rotating refresh token (HttpOnly Cookie).
+- **Database**: Defaults to SQLite (no configuration needed); switch to Postgres, etc., via environment variables.
+- **Authentication Flow**: Register/login with email + password → return short-lived access_token and set long-lived refresh_token in HttpOnly Cookie.
+- **Endpoints**: Register, Login, Refresh, Logout, Get current user (protected).
+- **CORS**: Defaults to allowing http://localhost:3000 (Next.js development default).
+
+
+## Quick Start
+1) Install dependencies (recommended to use a virtual environment)
+```bash
+cd backend
+python -m venv .venv
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+```  
+
+2) Configure environment variables (optional)  
+   Copy `.env.example` to `.env` and modify as needed:
+```
+# SQLite is ready to use by default, no modifications needed
+# Example for switching to Postgres: postgresql://user:pass@localhost:5432/suma
+DATABASE_URL=sqlite:///./suma.db
+JWT_SECRET=change-me-please-to-a-long-random-string
+CORS_ORIGINS=http://localhost:3000
+ACCESS_TOKEN_EXPIRE_MINUTES=15
+REFRESH_TOKEN_EXPIRE_DAYS=7
+```  
+
+3) Start the service
+```bash
+uvicorn app.main:app --reload --port 8000
+```  
+After startup, access Swagger: http://localhost:8000/docs
+
+
+## API Endpoints
+- **POST /auth/register**
+    - Request: `{ email, password }`
+    - Response: `{ access_token, token_type }`
+    - Effect: Sets refresh token in Cookie.
+
+- **POST /auth/login**
+    - Request: `{ email, password }`
+    - Response: `{ access_token, token_type }`
+    - Effect: Sets refresh token in Cookie.
+
+- **POST /auth/refresh**
+    - Request: None (relies on browser's built-in refresh token Cookie)
+    - Response: `{ access_token, token_type }`
+    - Effect: Rotates refresh token (updates Cookie).
+
+- **POST /auth/logout**
+    - Request: None
+    - Response: `{ ok: true }`
+    - Effect: Deletes refresh token Cookie.
+
+- **GET /me (Protected)**
+    - Header: `Authorization: Bearer `
+    - Response: `{ user_id }`
+
+
+### cURL Examples
+```bash
+# Register (first time)
+curl -i -X POST http://localhost:8000/auth/register \
+  -H 'Content-Type: application/json' \
+  -d '{"email":"user@example.com","password":"Passw0rd!"}'
+
+# Login (obtain new access_token and refresh cookie)
+curl -i -X POST http://localhost:8000/auth/login \
+  -H 'Content-Type: application/json' \
+  -d '{"email":"user@example.com","password":"Passw0rd!"}'
+
+# Access protected interface using access_token
+curl -s http://localhost:8000/me \
+  -H 'Authorization: Bearer '
+```  
+
+
+## Integration with Next.js Frontend
+Add environment variables to Next.js frontend (`.env.local`):
+```
+NEXT_PUBLIC_API_URL=http://localhost:8000
+```  
+
+In the submission handler of `app/login/page.tsx`, call FastAPI:
+```ts
+const res = await fetch(process.env.NEXT_PUBLIC_API_URL + '/auth/login', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  credentials: 'include', // Let the browser save the refresh cookie
+  body: JSON.stringify({ email, password }),
+})
+const data = await res.json() // { access_token }
+sessionStorage.setItem('access_token', data.access_token)
+```  
+
+When calling protected APIs later, include the Bearer Token in the frontend:
+```ts
+const token = sessionStorage.getItem('access_token')
+const me = await fetch(process.env.NEXT_PUBLIC_API_URL + '/me', {
+  headers: { Authorization: `Bearer ${token}` },
+})
+```  
+
+> **Note**: A more secure production approach is to have the Next.js server store the HttpOnly Cookie and proxy requests to FastAPI, avoiding exposure of the access token in the browser. Here, minimal viability is prioritized.
+
+
+## Do I Need a Database?
+- Yes, password-based login typically requires a database to store users (at minimum including email and hashed password).
+- For quick setup, this project defaults to SQLite (single-file `suma.db`), requiring no additional installation.
+- If deploying or supporting multiple users, switch to Postgres/MySQL by modifying `DATABASE_URL` only.
+
+
+## Project Structure
+```
+backend/
+  ├─ app/
+  │  ├─ __init__.py
+  │  ├─ config.py           # Configuration and environment variables
+  │  ├─ db.py               # SQLAlchemy initialization
+  │  ├─ models.py           # Database models (User)
+  │  ├─ schemas.py          # Pydantic models
+  │  ├─ security.py         # Password hashing and JWT handling
+  │  ├─ init_db.py          # Create tables
+  │  └─ main.py             # FastAPI entry point and routes
+  ├─ requirements.txt
+  └─ .env.example
+```  
+
+
+## Security Recommendations (Brief)
+- Set `secure=True` for Cookies in production (only transmitted over HTTPS).
+- Use a strong and sufficiently long `JWT_SECRET`.
+- Implement rate limiting or risk control for login/refresh endpoints.
+- Limit login attempts and monitor abnormal behavior at the database level.
+- Implement password reset, email verification, etc., before going live.
+
 # Suma FastAPI 後端
 
 一個最小可用（但考慮了基本安全）的密碼登錄後端，使用 FastAPI + SQLite + JWT（訪問令牌）+ 旋轉的刷新令牌（HttpOnly Cookie）。
