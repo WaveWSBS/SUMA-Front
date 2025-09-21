@@ -123,4 +123,16 @@
   body {
     @apply bg-background text-foreground;
   }
+  /* Ensure links show the pointer cursor for better affordance */
+  a[href] {
+    cursor: pointer;
+  }
+  /* Sidebar courses and dropdown arrows should also indicate clickability */
+  button,
+  [role="button"],
+  summary,
+  [aria-expanded],
+  [aria-haspopup] {
+    cursor: pointer;
+  }
 }
