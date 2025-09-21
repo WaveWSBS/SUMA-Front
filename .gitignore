@@ -3,6 +3,12 @@
 # dependencies
 /node_modules
 
+# JetBrains IDE
+.idea/
+*.iws
+*.iml
+*.ipr
+
 # next.js
 /.next/
 /out/
@@ -17,7 +23,12 @@ yarn-error.log*
 .pnpm-debug.log*
 
 # env files
-.env*
+.env
+!.env.example
+.env.local
+.env.development
+.env.test
+.env.production
 
 # vercel
 .vercel
