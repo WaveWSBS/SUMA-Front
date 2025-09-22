@@ -7,9 +7,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Playfair_Display } from "next/font/google"
-
-const playfair = Playfair_Display({ subsets: ["latin"], weight: ["400", "600", "700"] })
 
 export default function RegisterPage() {
   const router = useRouter()
@@ -29,22 +26,27 @@ export default function RegisterPage() {
 
     try {
       setLoading(true)
-      const api = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
-      const res = await fetch(`${api}/auth/register`, {
+      const res = await fetch(`/api/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        credentials: "include", // allow refresh token cookie to be set
+        credentials: "include", // ensure refresh cookie is set via proxy
         body: JSON.stringify({ email, password }),
       })
       const data = await res.json().catch(() => ({}))
+
       if (!res.ok) {
-        const msg = data?.detail || data?.message || "Registration failed."
+        const msg = data?.detail || data?.message || `Registration failed (${res.status}).`
         throw new Error(msg)
       }
+
       if (data?.access_token) {
-        sessionStorage.setItem("access_token", data.access_token)
+        try {
+          sessionStorage.setItem("access_token", data.access_token)
+        } catch {}
       }
-      router.push("/")
+
+      // Go to dashboard (home with auth guard B)
+      router.replace("/")
     } catch (err: any) {
       setError(err?.message || "Registration failed. Please try again.")
     } finally {
@@ -53,70 +55,59 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen grid md:grid-cols-2 bg-background">
-      {/* Left hero */}
-      <div className="hidden md:flex flex-col justify-center p-10 bg-muted/30 border-r">
-        <h1 className={`${playfair.className} text-5xl md:text-6xl font-semibold tracking-tight`}>Suma</h1>
-        <p className={`${playfair.className} mt-4 text-xl md:text-2xl text-muted-foreground`}>
-          Welcome to the next generation of learning
-        </p>
-      </div>
+    <div className="min-h-screen flex items-center justify-center p-4 bg-background">
+      <Card className="w-full max-w-md border-border">
+        <CardHeader>
+          <CardTitle className="text-2xl">Create your account</CardTitle>
+          <p className="text-sm text-muted-foreground">Sign up to start using Suma</p>
+        </CardHeader>
+        <CardContent>
+          <form className="space-y-6" onSubmit={onSubmit}>
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="you@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                autoComplete="email"
+              />
+            </div>
 
-      {/* Right form */}
-      <div className="flex items-center justify-center p-4">
-        <Card className="w-full max-w-md border-border">
-          <CardHeader>
-            <CardTitle className="text-2xl">Create your account</CardTitle>
-            <p className="text-sm text-muted-foreground">Join Suma in seconds</p>
-          </CardHeader>
-          <CardContent>
-            <form className="space-y-6" onSubmit={onSubmit}>
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="you@example.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  autoComplete="email"
-                />
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                type="password"
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                autoComplete="new-password"
+              />
+            </div>
+
+            {error && (
+              <div className="text-sm text-destructive" role="alert">
+                {error}
               </div>
+            )}
 
-              <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  autoComplete="new-password"
-                />
-              </div>
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading ? "Creating..." : "Create account"}
+            </Button>
 
-              {error && (
-                <div className="text-sm text-destructive" role="alert">
-                  {error}
-                </div>
-              )}
-
-              <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? "Creating..." : "Create account"}
-              </Button>
-
-              <p className="text-xs text-muted-foreground text-center">
-                Already have an account? {""}
-                <Link href="/login" className="text-primary hover:underline">
-                  Sign in
-                </Link>
-              </p>
-            </form>
-          </CardContent>
-        </Card>
-      </div>
+            <p className="text-xs text-muted-foreground text-center">
+              Already have an account? {" "}
+              <Link href="/login" className="text-primary hover:underline">
+                Sign in
+              </Link>
+            </p>
+          </form>
+        </CardContent>
+      </Card>
     </div>
   )
 }
