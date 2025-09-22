@@ -14,9 +14,10 @@ const courses = [
 interface SidebarProps {
   collapsed: boolean
   onToggle: () => void
+  courseBase?: string // base path for course links, default: "course"
 }
 
-export function Sidebar({ collapsed, onToggle }: SidebarProps) {
+export function Sidebar({ collapsed, onToggle, courseBase = "course" }: SidebarProps) {
   return (
     <div
       className={`bg-sidebar border-r border-sidebar-border transition-all duration-300 ${collapsed ? "w-16" : "w-64"} flex flex-col sticky top-0 h-screen`}
@@ -50,7 +51,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
           {courses.map((course) => {
             const Icon = course.icon
             return (
-              <Link key={course.id} href={`/course/${course.id}`}>
+              <Link key={course.id} href={`/${courseBase}/${course.id}`}>
                 <Button
                   variant="ghost"
                   className={`w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent ${collapsed ? "px-2" : "px-3"}`}

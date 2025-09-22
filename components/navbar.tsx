@@ -67,6 +67,10 @@ export function Navbar() {
                 <Settings className="mr-2 h-4 w-4" />
                 <span>Settings</span>
               </DropdownMenuItem>
+              <DropdownMenuItem onSelect={(e) => { e.preventDefault(); router.push('/teacher'); }}>
+                <User className="mr-2 h-4 w-4" />
+                <span>Teacher Dashboard</span>
+              </DropdownMenuItem>
               <DropdownMenuItem onSelect={(e) => { e.preventDefault(); handleLogout(); }}>
                 <LogOut className="mr-2 h-4 w-4" />
                 <span>Log out</span>
