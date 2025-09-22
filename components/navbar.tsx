@@ -6,8 +6,23 @@ import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Search, Bell, Settings, User, LogOut } from "lucide-react"
+import { useRouter } from "next/navigation"
 
 export function Navbar() {
+  const router = useRouter()
+
+  async function handleLogout() {
+    try {
+      const api = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+      await fetch(`${api}/auth/logout`, { method: "POST", credentials: "include" })
+    } catch (e) {
+      // ignore
+    } finally {
+      try { sessionStorage.removeItem("access_token") } catch {}
+      router.replace("/login")
+    }
+  }
+
   return (
     <div className="bg-card border-b border-border px-6 py-4">
       <div className="flex items-center justify-between">
@@ -53,7 +68,7 @@ export function Navbar() {
                 <Settings className="mr-2 h-4 w-4" />
                 <span>Settings</span>
               </DropdownMenuItem>
-              <DropdownMenuItem>
+              <DropdownMenuItem onSelect={(e) => { e.preventDefault(); handleLogout(); }}>
                 <LogOut className="mr-2 h-4 w-4" />
                 <span>Log out</span>
               </DropdownMenuItem>

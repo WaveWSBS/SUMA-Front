@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Sidebar } from "@/components/sidebar"
 import { Navbar } from "@/components/navbar"
@@ -24,8 +25,10 @@ import {
   BookOpen,
   FileText,
   Upload,
+  Sparkles,
 } from "lucide-react"
 
+// Local mock data used by the dashboard UI
 const todaysTasks = [
   {
     id: 1,
@@ -34,8 +37,19 @@ const todaysTasks = [
     type: "assignment",
     dueTime: "11:59 PM",
     status: "pending",
+    points: 100,
+    aiComment: "High Occurrence in tests",
   },
-  { id: 2, title: "Physics Lab Report", course: "Physics", type: "lab", dueTime: "2:00 PM", status: "submitted" },
+  {
+    id: 2,
+    title: "Physics Lab Report",
+    course: "Physics",
+    type: "lab",
+    dueTime: "2:00 PM",
+    status: "submitted",
+    points: 50,
+    aiComment: "Time Consuming",
+  },
   {
     id: 3,
     title: "CS Project Demo",
@@ -43,6 +57,8 @@ const todaysTasks = [
     type: "project",
     dueTime: "3:30 PM",
     status: "pending",
+    points: 30,
+    aiComment: "Practice Recommended",
   },
 ]
 
@@ -102,7 +118,7 @@ const courses = [
   },
 ]
 
-export default function Dashboard() {
+function DashboardUI() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [viewMode, setViewMode] = useState<"topics" | "weeks">("topics")
   const [openDropdowns, setOpenDropdowns] = useState<{ [key: number]: boolean }>({})
@@ -175,9 +191,9 @@ export default function Dashboard() {
             </Button>
           </div>
 
-          {/* Today's Overview */}
+          {/* Today\'s Overview */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Today's Tasks */}
+            {/* Today\'s Tasks */}
             <div className="lg:col-span-2">
               <Card className="bg-card border-border">
                 <CardHeader>
@@ -191,18 +207,30 @@ export default function Dashboard() {
                     <div key={task.id} className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
                       <div className={`w-3 h-3 rounded-full ${getTaskTypeColor(task.type)}`} />
                       <div className="flex-1">
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 flex-wrap">
                           <span className="font-medium text-card-foreground">{task.title}</span>
                           <Badge variant="outline" className="text-xs">
                             {task.course}
                           </Badge>
+                          <Badge variant="secondary" className="text-xs">
+                            {task.points} pts
+                          </Badge>
+                          <div className="flex items-center gap-1 px-2 py-1 bg-purple-100 dark:bg-purple-900/30 rounded-full">
+                            <Sparkles className="w-3 h-3 text-purple-600 dark:text-purple-400" />
+                            <span className="text-xs text-purple-700 dark:text-purple-300">{task.aiComment}</span>
+                          </div>
                         </div>
                         <p className="text-sm text-muted-foreground">Due: {task.dueTime}</p>
                       </div>
                       {task.status === "submitted" ? (
                         <CheckCircle className="w-5 h-5 text-green-500" />
                       ) : (
-                        <AlertCircle className="w-5 h-5 text-orange-500" />
+                        <Link href={`/task/${task.id}#submission`}>
+                          <Button variant="outline" size="sm" className="gap-2">
+                            <Upload className="w-4 h-4" />
+                            Submit
+                          </Button>
+                        </Link>
                       )}
                     </div>
                   ))}
@@ -368,4 +396,38 @@ export default function Dashboard() {
       </div>
     </div>
   )
+}
+
+export default function HomePage() {
+  const router = useRouter()
+  const [ready, setReady] = useState(false)
+
+  useEffect(() => {
+    let mounted = true
+    async function bootstrap() {
+      try {
+        // 1) If we already have an access token in sessionStorage, we are good.
+        const existing = typeof window !== "undefined" ? sessionStorage.getItem("access_token") : null
+        if (existing) {
+          if (mounted) setReady(true)
+          return
+        }
+        // 2) Otherwise try to refresh using the backend refresh cookie
+        const api = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+        const res = await fetch(`${api}/auth/refresh`, { method: "POST", credentials: "include" })
+        if (!res.ok) throw new Error("Refresh failed")
+        const data = await res.json().catch(() => ({}))
+        if (!data?.access_token) throw new Error("No access token returned")
+        try { sessionStorage.setItem("access_token", data.access_token) } catch {}
+        if (mounted) setReady(true)
+      } catch (e) {
+        router.replace("/login")
+      }
+    }
+    bootstrap()
+    return () => { mounted = false }
+  }, [router])
+
+  if (!ready) return null
+  return <DashboardUI />
 }
