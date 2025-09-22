@@ -413,8 +413,7 @@ export default function HomePage() {
           return
         }
         // 2) Otherwise try to refresh using the backend refresh cookie
-        const api = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
-        const res = await fetch(`${api}/auth/refresh`, { method: "POST", credentials: "include" })
+        const res = await fetch(`/api/auth/refresh`, { method: "POST", credentials: "include" })
         if (!res.ok) throw new Error("Refresh failed")
         const data = await res.json().catch(() => ({}))
         if (!data?.access_token) throw new Error("No access token returned")

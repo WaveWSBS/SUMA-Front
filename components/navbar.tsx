@@ -13,8 +13,7 @@ export function Navbar() {
 
   async function handleLogout() {
     try {
-      const api = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
-      await fetch(`${api}/auth/logout`, { method: "POST", credentials: "include" })
+      await fetch(`/api/auth/logout`, { method: "POST", credentials: "include" })
     } catch (e) {
       // ignore
     } finally {
