@@ -1,13 +1,7 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-# dependencies
+# Node.js dependencies
 /node_modules
-
-# JetBrains IDE
-.idea/
-*.iws
-*.iml
-*.ipr
 
 # next.js
 /.next/
@@ -16,7 +10,7 @@
 # production
 /build
 
-# debug
+# Package manager debug logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
@@ -25,6 +19,7 @@ yarn-error.log*
 # env files
 .env
 !.env.example
+.env.*
 .env.local
 .env.development
 .env.test
@@ -36,3 +31,39 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# IDE & editor
+.idea/
+*.iws
+*.iml
+*.ipr
+.vscode/
+.DS_Store
+
+# Testing & coverage artifacts
+coverage/
+.nyc_output/
+junit.xml
+
+# Python backend artifacts
+backend/__pycache__/
+backend/**/*.py[cod]
+backend/.pytest_cache/
+backend/.mypy_cache/
+backend/.ruff_cache/
+backend/.tox/
+backend/.venv/
+backend/venv/
+backend/env/
+backend/build/
+backend/dist/
+backend/*.egg-info/
+backend/pip-wheel-metadata/
+backend/.coverage
+backend/coverage.xml
+
+# Local databases & logs
+backend/**/*.sqlite
+backend/**/*.db
+backend/**/*.log
+suma.db
