@@ -1,105 +1,95 @@
 # Suma
 
-> 本說明僅供參考，請以 README-CN.md（中文版說明文件）為準。
+A modern learning management workspace built with Next.js 14, FastAPI, and SQLite for rapid prototyping.
 
-A full-stack web application for course and task management, featuring a modern Next.js frontend and a secure FastAPI backend.
-
-## Table of Contents
-- [Overview](#overview)
-- [Features](#features)
-- [Technologies Used](#technologies-used)
-- [Setup Instructions](#setup-instructions)
-  - [Frontend](#frontend)
-  - [Backend](#backend)
-- [Usage](#usage)
-- [Folder Structure](#folder-structure)
-- [Contributing](#contributing)
-
+> Looking for the Chinese documentation? Head to [`README-CN.md`](README-CN.md).
 
 ## Overview
-Suma is designed to help users manage courses and tasks efficiently. It provides authentication, a user-friendly interface, and secure data handling.
+Suma brings student and teacher experiences together in a single dashboard, pairing a polished React interface with an authentication-ready Python backend. The current build ships with rich UI mocks, an extensible API layer, and plumbing for JWT sessions so teams can focus on domain logic.
 
-## Features
-- User registration and login (JWT-based authentication)
-- Course and task management
-- Responsive UI with Radix UI components
-- Secure backend with FastAPI and SQLite
-- API endpoints for authentication and user management
+## Highlights
+- Student and teacher dashboards with calendars, task views, and an AI helper that run on realistic sample data and can be wired to live endpoints.
+- FastAPI backend that issues short-lived JWT access tokens plus rotating refresh tokens stored in HttpOnly cookies.
+- Shared design system powered by Radix UI, Tailwind CSS, and shadcn-inspired components, ready for rapid UI iteration.
+- Monorepo layout that includes the core app and an optional Vite-powered landing page for marketing use.
 
-## Technologies Used
-### Frontend
-- Next.js
-- React
-- Radix UI
-- Tailwind CSS/PostCSS
-- TypeScript
-
-### Backend
-- FastAPI
-- SQLite (default, can switch to Postgres)
-- SQLAlchemy
-- JWT (python-jose)
-- Passlib (bcrypt)
-- Pydantic
-
-## Setup Instructions
-### Frontend
-1. Install dependencies:
-   ```cmd
-   pnpm install
-   ```
-2. Start the development server:
-   ```cmd
-   pnpm dev
-   ```
-   The app will run at http://localhost:3000
-
-### Backend
-1. Navigate to the backend folder:
-   ```cmd
-   cd backend
-   ```
-2. Create and activate a virtual environment:
-   ```cmd
-   python -m venv .venv
-   .venv\Scripts\activate
-   ```
-3. Install dependencies:
-   ```cmd
-   pip install -r requirements.txt
-   ```
-4. (Optional) Configure environment variables:
-   - Copy `.env.example` to `.env` and edit as needed.
-   - Default database is SQLite. To use Postgres, update `DATABASE_URL`.
-5. Start the backend server:
-   ```cmd
-   uvicorn app.main:app --reload --port 8000
-   ```
-   Access Swagger docs at http://localhost:8000/docs
-
-## Usage
-- Register and log in to access course and task features.
-- Use the provided UI to manage your courses and tasks.
-- Backend API endpoints:
-  - `POST /auth/register` — Register a new user
-  - `POST /auth/login` — Log in
-  - `POST /auth/refresh` — Refresh access token
-  - `POST /auth/logout` — Log out
-  - `GET /users/me` — Get current user info
-
-## Folder Structure
+## Repository Layout
 ```
-Suma/
-├── app/                # Next.js frontend
-├── backend/            # FastAPI backend
-├── components/         # Shared React components
-├── hooks/              # Custom React hooks
-├── lib/                # Utility functions
-├── public/             # Static assets
-├── styles/             # Global styles
-├── package.json        # Frontend dependencies
-├── backend/requirements.txt # Backend dependencies
+Suma-Front/
+├── app/                  # Next.js App Router pages and routes
+├── components/           # Reusable UI primitives and feature components
+├── hooks/, lib/, styles/ # Frontend utilities and styling helpers
+├── backend/              # FastAPI application
+├── public/               # Static assets served by Next.js
+├── suma-landing/         # Standalone marketing site (Vite + React)
+└── README*.md            # Project documentation (EN + 中文)
 ```
+
+## Prerequisites
+- Node.js 18.18+ (Next.js 14 requirement)
+- `pnpm` 8+ for the main application (install with `npm install -g pnpm` if needed)
+- Python 3.11+ and `pip` for the backend
+- (Optional) `npm` 9+ if you plan to work on the Vite landing page
+
+## Getting Started
+
+### 1. Boot the FastAPI backend
+```bash
+cd backend
+python -m venv .venv
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+cp .env.example .env       # update values before committing
+uvicorn app.main:app --reload --port 8000
+```
+The default configuration writes a local SQLite database (`suma.db`) to the `backend/` directory. Update `DATABASE_URL` in `.env` to point at Postgres or another engine when you're ready.
+
+### 2. Run the Next.js application
+From the repository root:
+
+```bash
+pnpm install
+pnpm dev
+```
+
+By default the app starts on http://localhost:3000 and proxies any `/api/*` requests to the backend URL defined in `next.config.mjs` (see the environment section below).
+
+### 3. (Optional) Launch the marketing site
+```bash
+cd suma-landing
+npm install
+npm run dev
+```
+The landing page is independent from the main app and serves from http://localhost:5173.
+
+## Environment Configuration
+
+### Next.js (`.env.local`)
+| Variable | Default | Description |
+| --- | --- | --- |
+| `NEXT_PUBLIC_API_URL` | `http://127.0.0.1:8000` | Base URL used by client-side fetch calls. |
+| `BACKEND_URL` | Inherits `NEXT_PUBLIC_API_URL` | Used by `next.config.mjs` to proxy `/api/*` requests during development. |
+
+Create `.env.local` if you need to override the defaults.
+
+### FastAPI (`backend/.env`)
+| Variable | Default | Description |
+| --- | --- | --- |
+| `DATABASE_URL` | `sqlite:///./suma.db` | SQLAlchemy connection string. |
+| `JWT_SECRET` | — | Long random secret for signing tokens. |
+| `CORS_ORIGINS` | `http://localhost:3000` | Whitelisted frontend origins (comma-separated). |
+| `ACCESS_TOKEN_EXPIRE_MINUTES` | `15` | Access token lifespan in minutes. |
+| `REFRESH_TOKEN_EXPIRE_DAYS` | `7` | Refresh token lifespan in days. |
+
+## API Status
+The backend currently ships with authentication endpoints (`/auth/register`, `/auth/login`, `/auth/refresh`, `/auth/logout`, `/me`). Dashboard views in the frontend consume realistic mock data; wire them up to new endpoints by replacing the fetch calls in the respective pages or adding Next.js route handlers.
+
+## Useful Scripts
+- `pnpm dev` — run the Next.js development server.
+- `pnpm build && pnpm start` — build and serve the production bundle.
+- `pnpm lint` — run Next.js lint checks.
+- `uvicorn app.main:app --reload --port 8000` — serve the FastAPI backend locally.
+- `npm run dev` inside `suma-landing/` — develop the marketing site.
 
 ## Contributing
-Contributions are welcome! Please open issues or submit pull requests for improvements or bug fixes.
+Issues and pull requests are welcome. Please include clear reproduction steps, update documentation when behaviour changes, and keep frontend and backend changes scoped in separate commits whenever possible.
