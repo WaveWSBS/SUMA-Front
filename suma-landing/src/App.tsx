@@ -203,6 +203,9 @@ const integrationItems: Array<{
   },
 ]
 
+const landingUrl = "https://suma-edu.com"
+const demoUrl = "https://demo.suma-edu.com"
+
 const pricingTiers = [
   {
     name: "Starter",
@@ -210,6 +213,7 @@ const pricingTiers = [
     description: "Ideal for pilot cohorts and boutique academies validating AI-led contextual learning.",
     highlighted: false,
     cta: "Start Free Trial",
+    ctaHref: landingUrl,
     features: [
       "Up to 100 active learners",
       "AI mission orchestration & nudges",
@@ -223,6 +227,7 @@ const pricingTiers = [
     description: "Built for multi-campus and cross-market deployments requiring advanced intelligence.",
     highlighted: true,
     cta: "Book a Demo",
+    ctaHref: demoUrl,
     features: [
       "Unlimited learner seats",
       "Automated scenario generation & co-authoring",
@@ -236,6 +241,7 @@ const pricingTiers = [
     description: "End-to-end rollouts for large institutions, regulated entities, and multi-brand networks.",
     highlighted: false,
     cta: "Talk to Our Team",
+    ctaHref: demoUrl,
     features: [
       "Dedicated success squad & migration services",
       "Private cloud or on-premise options",
@@ -389,7 +395,9 @@ export default function App() {
                 <a href="#faq">FAQ</a>
               </button>
               <a
-                href="#pricing"
+                href={demoUrl}
+                target="_blank"
+                rel="noreferrer"
                 className="hidden items-center gap-1 rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/25 transition hover:bg-primary/90 md:flex"
               >
                 Talk to us
@@ -413,14 +421,18 @@ export default function App() {
               </p>
               <div className="flex flex-wrap items-center gap-6 pt-2">
                 <a
-                  href="#pricing"
+                  href={landingUrl}
+                  target="_blank"
+                  rel="noreferrer"
                   className="flex items-center gap-2 rounded-lg bg-primary px-7 py-3.5 text-base font-semibold text-primary-foreground shadow-[0_12px_45px_-12px_rgba(111,125,255,0.7)] transition hover:bg-primary/90"
                 >
                   Start Free Trial
                   <ArrowRight className="size-5" />
                 </a>
                 <a
-                  href="#pricing"
+                  href={demoUrl}
+                  target="_blank"
+                  rel="noreferrer"
                   className="flex items-center gap-2 rounded-lg border border-white/15 bg-white/5 px-7 py-3.5 text-base font-semibold text-white shadow-[0_12px_35px_-20px_rgba(15,20,35,0.9)] transition hover:border-primary/40 hover:bg-primary/10 hover:text-primary"
                 >
                   Book a Demo
@@ -509,7 +521,9 @@ export default function App() {
               </p>
             </div>
             <a
-              href="#pricing"
+              href={demoUrl}
+              target="_blank"
+              rel="noreferrer"
               className="w-full rounded-md border border-primary/40 px-6 py-3 text-center text-base font-semibold text-primary transition hover:bg-primary/10 md:w-auto"
             >
               Schedule full demo
@@ -747,7 +761,9 @@ export default function App() {
                   ))}
                 </ul>
                 <a
-                  href="#contact"
+                  href={tier.ctaHref}
+                  target="_blank"
+                  rel="noreferrer"
                   className={`rounded-md px-4 py-2 text-center text-sm font-semibold transition ${
                     tier.highlighted
                       ? "bg-primary text-primary-foreground shadow-lg shadow-primary/25 hover:bg-primary/90"
@@ -847,7 +863,9 @@ export default function App() {
               ))}
             </ul>
             <a
-              href="#hero"
+              href={demoUrl}
+              target="_blank"
+              rel="noreferrer"
               className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-primary transition hover:text-primary/80"
             >
               Plan your rollout
