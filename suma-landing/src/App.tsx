@@ -1,4 +1,4 @@
-import { Fragment, useState } from "react"
+import { Fragment, useRef, useState } from "react"
 import type { LucideIcon } from "lucide-react"
 import {
   ArrowRight,
@@ -386,6 +386,11 @@ export default function App() {
   const { track } = useAnalytics()
   const [activeDemo, setActiveDemo] = useState(demoViews[0]?.id ?? "missions")
   const activeDemoView = demoViews.find((view) => view.id === activeDemo) ?? demoViews[0]
+  const pricingSectionRef = useRef<HTMLElement | null>(null)
+
+  const handleBookDemoClick = () => {
+    pricingSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })
+  }
 
   return (
     <Fragment>
@@ -447,7 +452,7 @@ export default function App() {
               </p>
               <div className="flex flex-wrap items-center gap-6 pt-2">
                 <a
-                  href={landingUrl}
+                  href={demoUrl}
                   target="_blank"
                   rel="noreferrer"
                   className="flex items-center gap-2 rounded-lg bg-primary px-7 py-3.5 text-base font-semibold text-primary-foreground shadow-[0_12px_45px_-12px_rgba(111,125,255,0.7)] transition hover:bg-primary/90"
@@ -458,13 +463,12 @@ export default function App() {
                     })
                   }
                 >
-                  Start Free Trial
+                  Free Demo
                   <ArrowRight className="size-5" />
                 </a>
-                <a
-                  href={demoUrl}
-                  target="_blank"
-                  rel="noreferrer"
+                <button
+                  type="button"
+                  onClick={handleBookDemoClick}
                   className="flex items-center gap-2 rounded-lg border border-white/15 bg-white/5 px-7 py-3.5 text-base font-semibold text-white shadow-[0_12px_35px_-20px_rgba(15,20,35,0.9)] transition hover:border-primary/40 hover:bg-primary/10 hover:text-primary"
                   onClick={() =>
                     track("cta_click", {
@@ -473,9 +477,9 @@ export default function App() {
                     })
                   }
                 >
-                  Book a Demo
+                  Pricing
                   <ArrowRight className="size-5" />
-                </a>
+                </button>
                 <span className="w-full text-sm text-muted-foreground md:w-auto">No credit card required. 14-day full access.</span>
               </div>
             </div>
@@ -773,7 +777,7 @@ export default function App() {
           </div>
         </section>
 
-        <section id="pricing" className="mx-auto max-w-6xl px-6 pb-20">
+        <section ref={pricingSectionRef} id="pricing" className="mx-auto max-w-6xl px-6 pb-20">
           <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
             <div>
               <span className="inline-flex items-center rounded-full border border-primary/40 bg-primary/10 px-4 py-1 text-xs font-semibold uppercase tracking-[0.24em] text-primary">
