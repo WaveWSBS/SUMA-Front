@@ -17,6 +17,7 @@ import {
   Users,
   Zap,
 } from "lucide-react"
+import { trackEvent, useAnalytics } from "./analytics"
 
 const trustLogos = ["Dubai Future Foundation", "EdTech MENA Alliance", "AWS EdStart", "Coursera Partner Lab"]
 
@@ -319,7 +320,15 @@ function HeroTaskCard() {
         </div>
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-semibold text-white">AI Mission List</h3>
-          <button className="rounded-md border border-white/10 px-3 py-1 text-[11px] font-semibold text-muted-foreground transition hover:border-primary/40 hover:text-primary">
+          <button
+            className="rounded-md border border-white/10 px-3 py-1 text-[11px] font-semibold text-muted-foreground transition hover:border-primary/40 hover:text-primary"
+            onClick={() =>
+              trackEvent("interaction", {
+                component: "hero_task_card",
+                action: "export_actions",
+              })
+            }
+          >
             Export actions
           </button>
         </div>
@@ -349,7 +358,17 @@ function HeroTaskCard() {
               {task.status === "submitted" ? (
                 <CheckCircle className="mt-1 size-5 text-emerald-400" />
               ) : (
-                <button className="rounded-md border border-white/10 px-3 py-1 text-[11px] font-semibold text-white transition hover:border-primary/40 hover:text-primary">
+                <button
+                  className="rounded-md border border-white/10 px-3 py-1 text-[11px] font-semibold text-white transition hover:border-primary/40 hover:text-primary"
+                  onClick={() =>
+                    trackEvent("interaction", {
+                      component: "hero_task_card",
+                      action: "submit_now",
+                      taskId: task.id,
+                      taskTitle: task.title,
+                    })
+                  }
+                >
                   Submit now
                 </button>
               )}
@@ -364,6 +383,7 @@ function HeroTaskCard() {
 }
 
 export default function App() {
+  const { track } = useAnalytics()
   const [activeDemo, setActiveDemo] = useState(demoViews[0]?.id ?? "missions")
   const activeDemoView = demoViews.find((view) => view.id === activeDemo) ?? demoViews[0]
 
@@ -399,6 +419,12 @@ export default function App() {
                 target="_blank"
                 rel="noreferrer"
                 className="hidden items-center gap-1 rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/25 transition hover:bg-primary/90 md:flex"
+                onClick={() =>
+                  track("cta_click", {
+                    location: "header",
+                    label: "Talk to us",
+                  })
+                }
               >
                 Talk to us
                 <ArrowRight className="size-4" />
@@ -425,6 +451,12 @@ export default function App() {
                   target="_blank"
                   rel="noreferrer"
                   className="flex items-center gap-2 rounded-lg bg-primary px-7 py-3.5 text-base font-semibold text-primary-foreground shadow-[0_12px_45px_-12px_rgba(111,125,255,0.7)] transition hover:bg-primary/90"
+                  onClick={() =>
+                    track("sign_up", {
+                      location: "hero",
+                      label: "Start Free Trial",
+                    })
+                  }
                 >
                   Start Free Trial
                   <ArrowRight className="size-5" />
@@ -434,6 +466,12 @@ export default function App() {
                   target="_blank"
                   rel="noreferrer"
                   className="flex items-center gap-2 rounded-lg border border-white/15 bg-white/5 px-7 py-3.5 text-base font-semibold text-white shadow-[0_12px_35px_-20px_rgba(15,20,35,0.9)] transition hover:border-primary/40 hover:bg-primary/10 hover:text-primary"
+                  onClick={() =>
+                    track("cta_click", {
+                      location: "hero",
+                      label: "Book a Demo",
+                    })
+                  }
                 >
                   Book a Demo
                   <ArrowRight className="size-5" />
@@ -449,31 +487,33 @@ export default function App() {
           </div>
         </section>
 
-        <section className="mx-auto max-w-6xl px-6 py-12">
-          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-primary/80">
-            Trusted across the UAE and beyond
-          </p>
-          <div className="mt-6 grid gap-6 md:grid-cols-4">
-            {trustLogos.map((logo) => (
-              <div
-                key={logo}
-                className="rounded-2xl border border-white/10 bg-white/5 px-6 py-5 text-sm text-muted-foreground shadow-inner shadow-black/30"
-              >
-                {logo}
-              </div>
-            ))}
-          </div>
-          <div className="mt-10 grid gap-6 md:grid-cols-2">
-            {trustQuotes.map((quote) => (
-              <div key={quote.name} className="card-surface rounded-3xl border border-white/10 p-6">
-                <p className="text-lg font-semibold leading-relaxed text-white">{quote.quote}</p>
-                <p className="mt-4 text-sm text-muted-foreground">
-                  {quote.name}・{quote.title}
-                </p>
-              </div>
-            ))}
-          </div>
-        </section>
+        {false && (
+          <section className="mx-auto max-w-6xl px-6 py-12">
+            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-primary/80">
+              Trusted across the UAE and beyond
+            </p>
+            <div className="mt-6 grid gap-6 md:grid-cols-4">
+              {trustLogos.map((logo) => (
+                <div
+                  key={logo}
+                  className="rounded-2xl border border-white/10 bg-white/5 px-6 py-5 text-sm text-muted-foreground shadow-inner shadow-black/30"
+                >
+                  {logo}
+                </div>
+              ))}
+            </div>
+            <div className="mt-10 grid gap-6 md:grid-cols-2">
+              {trustQuotes.map((quote) => (
+                <div key={quote.name} className="card-surface rounded-3xl border border-white/10 p-6">
+                  <p className="text-lg font-semibold leading-relaxed text-white">{quote.quote}</p>
+                  <p className="mt-4 text-sm text-muted-foreground">
+                    {quote.name}・{quote.title}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
 
         <section id="features" className="mx-auto max-w-6xl px-6 py-20">
           <div className="max-w-2xl">
@@ -525,6 +565,12 @@ export default function App() {
               target="_blank"
               rel="noreferrer"
               className="w-full rounded-md border border-primary/40 px-6 py-3 text-center text-base font-semibold text-primary transition hover:bg-primary/10 md:w-auto"
+              onClick={() =>
+                track("cta_click", {
+                  location: "interactive_demo",
+                  label: "Schedule full demo",
+                })
+              }
             >
               Schedule full demo
               <ArrowRight className="ml-2 inline size-5" />
@@ -538,7 +584,13 @@ export default function App() {
                   <button
                     key={view.id}
                     type="button"
-                    onClick={() => setActiveDemo(view.id)}
+                    onClick={() => {
+                      setActiveDemo(view.id)
+                      track("demo_tab_select", {
+                        viewId: view.id,
+                        label: view.label,
+                      })
+                    }}
                     className={`rounded-lg border px-4 py-2 text-sm transition ${
                       isActive
                         ? "border-primary/60 bg-primary/10 text-primary shadow-inner shadow-primary/20"
@@ -769,6 +821,16 @@ export default function App() {
                       ? "bg-primary text-primary-foreground shadow-lg shadow-primary/25 hover:bg-primary/90"
                       : "border border-primary/40 text-primary hover:bg-primary/10"
                   }`}
+                  onClick={() =>
+                    track(
+                      tier.cta.toLowerCase().includes("trial") ? "sign_up" : "cta_click",
+                      {
+                        location: "pricing",
+                        label: tier.cta,
+                        tier: tier.name,
+                      },
+                    )
+                  }
                 >
                   {tier.cta}
                 </a>
@@ -813,7 +875,17 @@ export default function App() {
           </div>
           <div className="mt-8 rounded-3xl border border-white/10 bg-white/5">
             {faqItems.map((faq, index) => (
-              <details key={faq.question} className="border-b border-white/5 last:border-none">
+              <details
+                key={faq.question}
+                className="border-b border-white/5 last:border-none"
+                onToggle={(event) =>
+                  track("faq_response", {
+                    question: faq.question,
+                    state: event.currentTarget.open ? "open" : "closed",
+                    index,
+                  })
+                }
+              >
                 <summary className="cursor-pointer select-none px-6 py-4 text-left text-base font-medium text-white">
                   {faq.question}
                 </summary>
@@ -867,6 +939,12 @@ export default function App() {
               target="_blank"
               rel="noreferrer"
               className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-primary transition hover:text-primary/80"
+              onClick={() =>
+                track("cta_click", {
+                  location: "footer",
+                  label: "Plan your rollout",
+                })
+              }
             >
               Plan your rollout
               <ArrowRight className="size-4" />

@@ -62,6 +62,21 @@ npm run dev
 ```
 The landing page is independent from the main app and serves from http://localhost:5173.
 
+#### Landing page metrics collection
+- `suma-landing/src/analytics.ts` instruments the marketing page and records five core event types: `visit` (fires on load), `sign_up` (free-trial CTAs), `cta_click` (demo/contact CTAs), `demo_tab_select` (interactive tabs), and `faq_response` (FAQ expands/collapses). Additional UI-specific interactions fall under `interaction`.
+- Events are appended to `localStorage` under the `suma-metrics-buffer` key, capped at the 200 most recent occurrences so you can inspect behaviour without a backend.
+- Provide `VITE_ANALYTICS_ENDPOINT` in `suma-landing/.env.local` (or `.env`) to automatically forward buffered events; the client sends a JSON payload via `navigator.sendBeacon` with a fallback to `fetch` (see `suma-landing/.env.example`).
+- The payload posted to your endpoint matches:
+  ```json
+  {
+    "events": [
+      { "type": "visit", "timestamp": "2024-05-01T12:00:00.000Z", "sessionId": "uuid", "metadata": { "path": "/", "label": "Start Free Trial", "referrer": "…" } }
+    ],
+    "flushedAt": "2024-05-01T12:00:01.000Z"
+  }
+  ```
+- Use the metadata to derive key metrics: visits (unique session IDs), sign-up intent (count `sign_up`), CTA performance (filter by `cta_click`), and FAQ engagement (`faq_response`).
+
 ## Environment Configuration
 
 ### Next.js (`.env.local`)
