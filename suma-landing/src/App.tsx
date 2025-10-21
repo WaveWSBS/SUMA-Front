@@ -210,7 +210,7 @@ const demoUrl = "https://demo.suma-edu.com"
 const pricingTiers = [
   {
     name: "Starter",
-    price: "AED 3,200 / month",
+    price: "20 USD / month",
     description: "Ideal for pilot cohorts and boutique academies validating AI-led contextual learning.",
     highlighted: false,
     cta: "Start Free Trial",
@@ -224,7 +224,7 @@ const pricingTiers = [
   },
   {
     name: "Growth",
-    price: "AED 8,900 / month",
+    price: "25 USD / month",
     description: "Built for multi-campus and cross-market deployments requiring advanced intelligence.",
     highlighted: true,
     cta: "Book a Demo",
