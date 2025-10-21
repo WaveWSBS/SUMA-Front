@@ -691,7 +691,7 @@ export default function App() {
           </div>
         </section>
 
-        <section className="mx-auto max-w-6xl px-6 pb-20">
+        {/* <section className="mx-auto max-w-6xl px-6 pb-20">
           <div className="grid gap-10 lg:grid-cols-[1.2fr,1fr]">
             <div>
               <span className="inline-flex items-center rounded-full border border-primary/40 bg-primary/10 px-4 py-1 text-xs font-semibold uppercase tracking-[0.24em] text-primary">
@@ -744,7 +744,7 @@ export default function App() {
               </div>
             </div>
           </div>
-        </section>
+        </section> */}
 
         <section className="mx-auto max-w-6xl px-6 pb-20">
           <div className="max-w-2xl">
