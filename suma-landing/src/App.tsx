@@ -388,7 +388,11 @@ export default function App() {
   const activeDemoView = demoViews.find((view) => view.id === activeDemo) ?? demoViews[0]
   const pricingSectionRef = useRef<HTMLElement | null>(null)
 
-  const handleBookDemoClick = () => {
+  const handlePricingClick = () => {
+    track("cta_click", {
+      location: "hero",
+      label: "Pricing",
+    })
     pricingSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })
   }
 
@@ -459,7 +463,7 @@ export default function App() {
                   onClick={() =>
                     track("sign_up", {
                       location: "hero",
-                      label: "Start Free Trial",
+                      label: "Free Demo",
                     })
                   }
                 >
@@ -468,19 +472,12 @@ export default function App() {
                 </a>
                 <button
                   type="button"
-                  onClick={handleBookDemoClick}
+                  onClick={handlePricingClick}
                   className="flex items-center gap-2 rounded-lg border border-white/15 bg-white/5 px-7 py-3.5 text-base font-semibold text-white shadow-[0_12px_35px_-20px_rgba(15,20,35,0.9)] transition hover:border-primary/40 hover:bg-primary/10 hover:text-primary"
-                  onClick={() =>
-                    track("cta_click", {
-                      location: "hero",
-                      label: "Book a Demo",
-                    })
-                  }
                 >
                   Pricing
                   <ArrowRight className="size-5" />
                 </button>
-                <span className="w-full text-sm text-muted-foreground md:w-auto">No credit card required. 14-day full access.</span>
               </div>
             </div>
             <div className="relative flex-1">
