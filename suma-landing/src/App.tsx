@@ -210,7 +210,7 @@ const demoUrl = "https://demo.suma-edu.com"
 const pricingTiers = [
   {
     name: "Starter",
-    price: "20 USD / month",
+    price: "15 USD / Student / month",
     description: "Ideal for pilot cohorts and boutique academies validating AI-led contextual learning.",
     highlighted: false,
     cta: "Start Free Trial",
@@ -220,20 +220,6 @@ const pricingTiers = [
       "AI mission orchestration & nudges",
       "Scenario starter templates",
       "Standard dashboards & exports",
-    ],
-  },
-  {
-    name: "Growth",
-    price: "25 USD / month",
-    description: "Built for multi-campus and cross-market deployments requiring advanced intelligence.",
-    highlighted: true,
-    cta: "Book a Demo",
-    ctaHref: demoUrl,
-    features: [
-      "Unlimited learner seats",
-      "Automated scenario generation & co-authoring",
-      "Custom KPI dashboards & live alerts",
-      "Full API, SSO, and webhook integrations",
     ],
   },
   {
