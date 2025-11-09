@@ -38,6 +38,11 @@ interface TaskOut {
   ai_comment?: string
 }
 
+type DisplayTask = TaskOut & {
+  course_name?: string
+  course_code?: string
+}
+
 const iconMap: Record<string, any> = {
   Calculator: BookOpen, // fallback icons for teacher cards
   Atom: BookOpen,
@@ -63,6 +68,84 @@ const aiInsightPool = [
 const getTaskColor = (type?: string) => taskTypeColorMap[type || ""] || taskTypeColorMap.default
 
 const resolveInsight = (task: TaskOut, index: number) => task.ai_comment || aiInsightPool[index % aiInsightPool.length]
+
+const teacherTaskSamples: DisplayTask[] = [
+  {
+    id: "sample-precalc-functions",
+    course_id: "sample-precalc",
+    title: "函數與圖形練習講義",
+    type: "assignment",
+    due_date: "週四",
+    due_time: "10:00 AM",
+    points: 30,
+    ai_comment: "基礎概念掌握度分散，建議課前小測",
+    course_name: "Precalculus",
+    course_code: "MATH 201",
+  },
+  {
+    id: "sample-apcalc-series",
+    course_id: "sample-apcalc",
+    title: "泰勒級數重點講義",
+    type: "assignment",
+    due_date: "週五",
+    due_time: "2:30 PM",
+    points: 40,
+    ai_comment: "往年此單元錯誤率偏高，建議補充例題",
+    course_name: "AP Calculus BC",
+    course_code: "AP CALC BC",
+  },
+  {
+    id: "sample-apcalc-ftc",
+    course_id: "sample-apcalc",
+    title: "微積分基本定理例題解析",
+    type: "project",
+    due_date: "下週一",
+    due_time: "9:00 AM",
+    points: 25,
+    ai_comment: "建議提供分段練習，降低一次性負擔",
+    course_name: "AP Calculus BC",
+    course_code: "AP CALC BC",
+  },
+] as const
+
+const courseShowcaseSamples = [
+  {
+    scheduleKey: "adv-math-101",
+    id: "precalc-spotlight",
+    name: "Precalculus",
+    code: "MATH 201",
+    grade: "B+",
+    progress: 68,
+    assignments: 2,
+    nextClass: "Today, 10:00 AM",
+    color: "bg-blue-500",
+    icon: Calculator,
+    topics: [
+      { title: "Functions & Graphs", completed: true },
+      { title: "Trigonometric Basics", completed: true },
+      { title: "Algebraic Manipulation", completed: false },
+      { title: "Intro to Limits", completed: false },
+    ],
+  },
+  {
+    scheduleKey: "calculus-101",
+    id: "ap-calc-bc-spotlight",
+    name: "AP Calculus BC",
+    code: "AP CALC BC",
+    grade: "A-",
+    progress: 76,
+    assignments: 3,
+    nextClass: "Tomorrow, 2:15 PM",
+    color: "bg-indigo-500",
+    icon: Calculator,
+    topics: [
+      { title: "Limits & Continuity", completed: true },
+      { title: "Derivatives", completed: true },
+      { title: "Integrals & FTC", completed: false },
+      { title: "Series (Taylor/Maclaurin)", completed: false },
+    ],
+  },
+] as const
 
 // Static class schedule for the teacher (written dead as requested)
 const teacherSchedule = [
@@ -98,6 +181,12 @@ export default function TeacherDashboardPage() {
     () => new Map((courses || []).map((course) => [course.id, course])),
     [courses],
   )
+  const spotlightLookup = useMemo(
+    () => new Map(courseShowcaseSamples.map((sample) => [sample.scheduleKey, sample])),
+    [],
+  )
+  const displayTasks: DisplayTask[] = tasks.length > 0 ? tasks : teacherTaskSamples
+  const showingSamples = tasks.length === 0
 
   useEffect(() => {
     async function ensureAuth() {
@@ -211,12 +300,17 @@ export default function TeacherDashboardPage() {
                       ))}
                     </div>
                   )}
-                  {!loading && tasks.length === 0 && (
-                    <div className="text-sm text-muted-foreground">目前沒有接下來的教學任務。</div>
+                  {!loading && showingSamples && (
+                    <div className="text-xs text-muted-foreground">
+                      以下為樣例任務，等待後端資料接入時可立即替換。
+                    </div>
                   )}
-                  {tasks.map((task, idx) => {
+                  {displayTasks.map((task, idx) => {
                     const course = courseLookup.get(task.course_id)
-                    const courseLabel = course ? `${course.name}${course.code ? ` (${course.code})` : ""}` : "未指定課程"
+                    const fallbackLabel = task.course_name
+                      ? `${task.course_name}${task.course_code ? ` (${task.course_code})` : ""}`
+                      : "未指定課程"
+                    const courseLabel = course ? `${course.name}${course.code ? ` (${course.code})` : ""}` : fallbackLabel
                     const dueDisplay = [task.due_date, task.due_time].filter(Boolean).join(" ") || "待定"
                     const insight = resolveInsight(task, idx)
                     const courseLink = course ? `/teacher/course/${course.id}` : undefined
@@ -270,10 +364,10 @@ export default function TeacherDashboardPage() {
             <Card>
               <CardHeader className="flex flex-col gap-1">
                 <CardTitle className="text-xl">Teaching Schedule</CardTitle>
-                <p className="text-sm text-muted-foreground">固定課程安排，方便快速進入課程管理。</p>
+                <p className="text-sm text-muted-foreground">結合排程與課程洞察，快速檢視進度與主題。</p>
               </CardHeader>
               <CardContent>
-                <div className="grid gap-4 md:grid-cols-2">
+                <div className="grid gap-6 md:grid-cols-2">
                   {teacherSchedule.map((cls) => {
                     const Icon = cls.icon
                     const matched = (courses || []).find((c) => {
@@ -283,37 +377,98 @@ export default function TeacherDashboardPage() {
                         return false
                       }
                     })
+                    const snapshot = spotlightLookup.get(cls.key)
+                    const displayName = matched?.name ?? snapshot?.name ?? cls.title
+                    const displayCode = matched?.code ?? snapshot?.code ?? ""
+                    const displayGrade = matched?.grade ?? snapshot?.grade ?? "—"
+                    const progressValue = matched?.progress ?? snapshot?.progress ?? 0
+                    const assignments = matched?.assignments ?? snapshot?.assignments ?? 0
+                    const nextClass = matched?.next_class ?? snapshot?.nextClass ?? cls.time
+                    const topics =
+                      snapshot?.topics ??
+                      [
+                        { title: "Lesson tailoring", completed: true },
+                        { title: "Assessment prep", completed: false },
+                      ]
                     return (
-                      <div key={cls.key} className="p-4 rounded-2xl border border-border bg-muted/30 space-y-3">
-                        <div className="flex items-start gap-3">
-                          <div className={`w-11 h-11 rounded-xl ${cls.color} flex items-center justify-center`}>
-                            <Icon className="w-5 h-5 text-white" />
-                          </div>
-                          <div className="space-y-1">
-                            <div className="font-semibold">{cls.title}</div>
-                            <div className="text-xs text-muted-foreground flex items-center gap-2">
-                              <Calendar className="w-3 h-3" />
-                              {cls.time}
+                      <Card key={cls.key} className="bg-card border-border rounded-3xl shadow-sm">
+                        <CardContent className="p-5 space-y-5">
+                          <div className="flex items-center justify-between gap-4">
+                            <div className="flex items-center gap-3">
+                              <div className={`w-12 h-12 rounded-2xl ${cls.color} flex items-center justify-center`}>
+                                <Icon className="w-6 h-6 text-white" />
+                              </div>
+                              <div>
+                                <div className="text-lg font-semibold text-card-foreground">{displayName}</div>
+                                <p className="text-sm text-muted-foreground">
+                                  {displayCode ? `${displayCode} • ` : ""}
+                                  Grade: {displayGrade}
+                                </p>
+                              </div>
                             </div>
-                            <div className="text-xs text-muted-foreground">地點：{cls.room}</div>
+                            <div className="text-right text-sm text-muted-foreground">
+                              <div className="flex items-center gap-1 justify-end">
+                                <Calendar className="w-3 h-3" />
+                                {cls.time}
+                              </div>
+                              <div className="text-xs">地點：{cls.room}</div>
+                            </div>
                           </div>
-                        </div>
-                        <div className="flex justify-end">
-                          {matched ? (
-                            <Link href={`/teacher/course/${matched.id}`}>
-                              <Button size="sm" className="gap-2">
+                          <div>
+                            <div className="flex items-center justify-between text-sm text-muted-foreground mb-2">
+                              <span>Progress</span>
+                              <span className="font-semibold text-foreground">{progressValue}%</span>
+                            </div>
+                            <div className="h-2 w-full rounded-full bg-muted">
+                              <div
+                                className="h-full rounded-full bg-indigo-400"
+                                style={{ width: `${progressValue}%` }}
+                              />
+                            </div>
+                            <div className="mt-2 flex items-center justify-between text-sm text-muted-foreground">
+                              <span>{assignments} assignments</span>
+                              <span>{nextClass}</span>
+                            </div>
+                          </div>
+                          <div className="space-y-2">
+                            <p className="text-sm font-semibold text-card-foreground">Topics</p>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                              {topics.map((topic) => (
+                                <div
+                                  key={topic.title}
+                                  className={`flex items-center gap-2 px-3 py-2 rounded-2xl text-sm ${
+                                    topic.completed
+                                      ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-200"
+                                      : "bg-muted text-muted-foreground"
+                                  }`}
+                                >
+                                  <span
+                                    className={`w-2 h-2 rounded-full ${
+                                      topic.completed ? "bg-emerald-500" : "bg-muted-foreground/50"
+                                    }`}
+                                  />
+                                  {topic.title}
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                          <div className="flex justify-end">
+                            {matched ? (
+                              <Link href={`/teacher/course/${matched.id}`}>
+                                <Button size="sm" className="gap-2">
+                                  <BookOpen className="w-4 h-4" />
+                                  進入課程
+                                </Button>
+                              </Link>
+                            ) : (
+                              <Button size="sm" variant="outline" disabled className="gap-2">
                                 <BookOpen className="w-4 h-4" />
-                                進入課程
+                                無對應課程
                               </Button>
-                            </Link>
-                          ) : (
-                            <Button size="sm" variant="outline" disabled className="gap-2">
-                              <BookOpen className="w-4 h-4" />
-                              無對應課程
-                            </Button>
-                          )}
-                        </div>
-                      </div>
+                            )}
+                          </div>
+                        </CardContent>
+                      </Card>
                     )
                   })}
                 </div>
