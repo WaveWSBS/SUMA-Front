@@ -475,68 +475,7 @@ export default function TeacherDashboardPage() {
               </CardContent>
             </Card>
 
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h2 className="text-xl font-semibold text-foreground">Your Courses</h2>
-                  <p className="text-sm text-muted-foreground">快速掌握每門課程的進度與工作量。</p>
-                </div>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                {(Array.isArray(courses) ? courses : []).map((course) => {
-                  const Icon = iconMap[course.icon ?? ""] || BookOpen
-                  return (
-                    <Link key={course.id} href={`/teacher/course/${course.id}`} className="block">
-                      <Card className="h-full bg-card border-border hover:bg-accent/40 transition-colors">
-                        <CardContent className="p-4 space-y-4">
-                          <div className="flex items-center gap-3">
-                            <div
-                              className={`w-12 h-12 rounded-xl ${course.color || "bg-primary"} flex items-center justify-center flex-shrink-0`}
-                            >
-                              <Icon className="w-5 h-5 text-white" />
-                            </div>
-                            <div className="min-w-0">
-                              <div className="font-medium text-card-foreground truncate">{course.name}</div>
-                              <p className="text-xs text-muted-foreground truncate">{course.code}</p>
-                            </div>
-                          </div>
-                          <div className="space-y-2">
-                            <div className="flex items-center justify-between text-xs text-muted-foreground">
-                              <span>Next class</span>
-                              <span className="flex items-center gap-1">
-                                <Calendar className="w-3 h-3" />
-                                {course.next_class || "待排程"}
-                              </span>
-                            </div>
-                            <div>
-                              <div className="flex items-center justify-between mb-1 text-xs">
-                                <span>Progress</span>
-                                <span className="font-semibold">{course.progress ?? 0}%</span>
-                              </div>
-                              <Progress value={course.progress ?? 0} />
-                            </div>
-                          </div>
-                          <div className="flex flex-wrap gap-2">
-                            <Badge variant="secondary" className="text-xs">
-                              Assignments: {course.assignments ?? 0}
-                            </Badge>
-                            {course.grade && (
-                              <Badge className="text-xs bg-emerald-500/15 text-emerald-500">Avg Grade {course.grade}</Badge>
-                            )}
-                          </div>
-                          {course.description && (
-                            <p className="text-xs text-muted-foreground">{course.description}</p>
-                          )}
-                        </CardContent>
-                      </Card>
-                    </Link>
-                  )
-                })}
-              </div>
-              {!loading && courses.length === 0 && (
-                <div className="text-sm text-muted-foreground">尚未指派任何課程。</div>
-              )}
-            </div>
+            {/* Your Courses section removed as requested */}
           </div>
         </div>
       </div>
