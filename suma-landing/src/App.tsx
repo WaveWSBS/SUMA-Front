@@ -373,6 +373,11 @@ export default function App() {
   const [activeDemo, setActiveDemo] = useState(demoViews[0]?.id ?? "missions")
   const activeDemoView = demoViews.find((view) => view.id === activeDemo) ?? demoViews[0]
   const pricingSectionRef = useRef<HTMLElement | null>(null)
+  const pricingGridColumnsClass =
+    pricingTiers.length === 1 ? "" : pricingTiers.length === 2 ? "md:grid-cols-2" : "md:grid-cols-3"
+  const comparisonGridTemplate = {
+    gridTemplateColumns: `minmax(0, 1.4fr) repeat(${pricingTiers.length}, minmax(0, 1fr))`,
+  }
 
   const handlePricingClick = () => {
     track("cta_click", {
@@ -775,7 +780,7 @@ export default function App() {
               includes a 14-day free trial.
             </p>
           </div>
-          <div className="mt-10 grid gap-6 md:grid-cols-3">
+          <div className={`mt-10 grid gap-6 ${pricingGridColumnsClass}`}>
             {pricingTiers.map((tier) => (
               <div
                 key={tier.name}
@@ -825,7 +830,10 @@ export default function App() {
             ))}
           </div>
           <div className="mt-12 overflow-hidden rounded-3xl border border-white/10">
-            <div className="grid grid-cols-[1.4fr_repeat(3,1fr)] bg-white/5 text-xs uppercase tracking-wider text-muted-foreground">
+            <div
+              className="grid bg-white/5 text-xs uppercase tracking-wider text-muted-foreground"
+              style={comparisonGridTemplate}
+            >
               <div className="px-6 py-4">Feature comparison</div>
               {pricingTiers.map((tier) => (
                 <div key={`${tier.name}-header`} className="px-6 py-4 text-center">
@@ -836,7 +844,8 @@ export default function App() {
             {comparisonMatrix.map((row) => (
               <div
                 key={row.feature}
-                className="grid grid-cols-[1.4fr_repeat(3,1fr)] border-t border-white/5 bg-black/30 text-sm text-muted-foreground"
+                className="grid border-t border-white/5 bg-black/30 text-sm text-muted-foreground"
+                style={comparisonGridTemplate}
               >
                 <div className="px-6 py-4">{row.feature}</div>
                 {pricingTiers.map((tier) => (
