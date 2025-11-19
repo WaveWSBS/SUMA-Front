@@ -1,14 +1,15 @@
 "use client"
 import { Button } from "@/components/ui/button"
-import { BookOpen, Calculator, Atom, Code, Globe, Palette, FileText, ChevronLeft, ChevronRight } from "lucide-react"
+import { BookOpen, Calculator, Atom, Code, Globe, Palette, FileText, ChevronLeft, ChevronRight, FlaskConical } from "lucide-react"
 import Link from "next/link"
 
 const courses = [
-  { id: 1, name: "Mathematics", code: "MATH 301", icon: Calculator, color: "bg-blue-500", progress: 75 },
-  { id: 2, name: "Physics", code: "PHYS 201", icon: Atom, color: "bg-green-500", progress: 60 },
-  { id: 3, name: "Computer Science", code: "CS 350", icon: Code, color: "bg-purple-500", progress: 85 },
-  { id: 4, name: "History", code: "HIST 101", icon: Globe, color: "bg-orange-500", progress: 45 },
-  { id: 5, name: "Art", code: "ART 250", icon: Palette, color: "bg-pink-500", progress: 70 },
+  { id: 1, name: "Chemistry", code: "CHEM 101", icon: FlaskConical, color: "bg-emerald-500", progress: 40 },
+  { id: 2, name: "Mathematics", code: "MATH 301", icon: Calculator, color: "bg-blue-500", progress: 75 },
+  { id: 3, name: "Physics", code: "PHYS 201", icon: Atom, color: "bg-green-500", progress: 60 },
+  { id: 4, name: "Computer Science", code: "CS 350", icon: Code, color: "bg-purple-500", progress: 85 },
+  { id: 5, name: "History", code: "HIST 101", icon: Globe, color: "bg-orange-500", progress: 45 },
+  { id: 6, name: "Art", code: "ART 250", icon: Palette, color: "bg-pink-500", progress: 70 },
 ]
 
 interface SidebarProps {

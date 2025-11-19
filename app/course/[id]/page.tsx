@@ -30,21 +30,22 @@ import {
   Calendar,
   Grid3X3,
   Sparkles,
+  FlaskConical,
 } from "lucide-react"
 
 const courseData = {
   id: 1,
-  name: "Mathematics",
-  code: "MATH 301",
+  name: "General Chemistry",
+  code: "CHEM 101",
   semester: "Fall 2024",
   credits: 3,
-  description: "Advanced topics in calculus, linear algebra, and differential equations.",
+  description: "Introduction to atomic structure, chemical bonding, stoichiometry, and thermochemistry with laboratory applications.",
   professor: {
-    name: "Dr. Sarah Johnson",
-    email: "s.johnson@university.edu",
+    name: "Dr. Emily Zhang",
+    email: "e.zhang@university.edu",
     phone: "+1 (555) 123-4567",
-    office: "Math Building, Room 205",
-    officeHours: "Mon/Wed 2-4 PM",
+    office: "Science Building, Room 310",
+    officeHours: "Tue/Thu 3-5 PM",
     zoomLink: "https://zoom.us/j/123456789",
     avatar: "/placeholder.svg?height=64&width=64",
   },
@@ -53,7 +54,7 @@ const courseData = {
 const upcomingTasks = [
   {
     id: 1,
-    title: "Calculus Problem Set #8",
+    title: "Stoichiometry Problem Set",
     type: "assignment",
     dueDate: "2024-03-15",
     dueTime: "11:59 PM",
@@ -63,7 +64,7 @@ const upcomingTasks = [
   },
   {
     id: 2,
-    title: "Midterm Exam",
+    title: "Chemistry Midterm Exam",
     type: "exam",
     dueDate: "2024-03-18",
     dueTime: "10:00 AM",
@@ -73,7 +74,7 @@ const upcomingTasks = [
   },
   {
     id: 3,
-    title: "Linear Algebra Quiz",
+    title: "Atomic Structure Quiz",
     type: "quiz",
     dueDate: "2024-03-20",
     dueTime: "2:00 PM",
@@ -86,7 +87,7 @@ const upcomingTasks = [
 const modules = [
   {
     id: 1,
-    title: "Differential Calculus",
+    title: "Atomic Structure and Periodicity",
     progress: 100,
     lessons: 8,
     completed: 8,
@@ -94,7 +95,7 @@ const modules = [
   },
   {
     id: 2,
-    title: "Integral Calculus",
+    title: "Chemical Bonding and Molecular Geometry",
     progress: 75,
     lessons: 6,
     completed: 4,
@@ -102,7 +103,7 @@ const modules = [
   },
   {
     id: 3,
-    title: "Linear Algebra",
+    title: "States of Matter and Intermolecular Forces",
     progress: 30,
     lessons: 10,
     completed: 3,
@@ -110,7 +111,7 @@ const modules = [
   },
   {
     id: 4,
-    title: "Differential Equations",
+    title: "Thermochemistry and Chemical Reactions",
     progress: 0,
     lessons: 8,
     completed: 0,
@@ -119,10 +120,20 @@ const modules = [
 ]
 
 const resources = [
-  { id: 1, name: "Course Syllabus", type: "pdf", size: "2.3 MB" },
-  { id: 2, name: "Textbook: Advanced Calculus", type: "pdf", size: "45.2 MB" },
-  { id: 3, name: "Formula Sheet", type: "pdf", size: "1.1 MB" },
-  { id: 4, name: "Practice Problems", type: "pdf", size: "8.7 MB" },
+  {
+    id: 1,
+    name: "CHEM 101 Syllabus",
+    type: "pdf",
+    size: "2.0 MB",
+    href: undefined,
+  },
+  {
+    id: 2,
+    name: "Textbook: General Chemistry",
+    type: "pdf",
+    size: "48.0 MB",
+    href: "/pdfs/chemistry/textbook.pdf",
+  },
 ]
 
 const attendanceData = [
@@ -135,10 +146,10 @@ const attendanceData = [
 ]
 
 const grades = [
-  { assignment: "Problem Set #1", score: 95, total: 100, weight: "10%" },
-  { assignment: "Problem Set #2", score: 88, total: 100, weight: "10%" },
-  { assignment: "Quiz #1", score: 42, total: 50, weight: "5%" },
-  { assignment: "Problem Set #3", score: 92, total: 100, weight: "10%" },
+  { assignment: "Stoichiometry Problem Set", score: 95, total: 100, weight: "10%" },
+  { assignment: "Atomic Structure Homework", score: 88, total: 100, weight: "10%" },
+  { assignment: "Quiz: Chemical Bonding", score: 42, total: 50, weight: "5%" },
+  { assignment: "Gas Laws Worksheet", score: 92, total: 100, weight: "10%" },
   { assignment: "Midterm Exam", score: null, total: 200, weight: "25%" },
 ]
 
@@ -217,52 +228,52 @@ export default function CoursePage() {
     {
       id: 1,
       week: "Week 1-2",
-      title: "Introduction to Differential Calculus",
+      title: "Introduction to Atomic Structure",
       progress: 100,
       lessons: 8,
       completed: 8,
       status: "completed",
       description:
-        "Fundamental concepts of derivatives, limits, and continuity. Learn the basic rules of differentiation.",
-      materials: ["Lecture Notes 1-2", "Video: Limits Explained", "Practice Problems Set A"],
-      assignments: ["Problem Set #1", "Quiz: Basic Derivatives"],
+        "Fundamental concepts of atoms, isotopes, and the periodic table. Learn how elements are organized.",
+      materials: ["Lecture Notes 1-2", "Video: Atomic Models", "Practice Problems Set A"],
+      assignments: ["Atomic Structure Homework", "Quiz: Periodic Trends"],
     },
     {
       id: 2,
       week: "Week 3-4",
-      title: "Advanced Integration Techniques",
+      title: "Moles, Stoichiometry, and Reactions",
       progress: 75,
       lessons: 6,
       completed: 4,
       status: "in-progress",
-      description: "Integration by parts, substitution methods, and applications of integrals in real-world problems.",
-      materials: ["Lecture Notes 3-4", "Integration Techniques Guide", "Calculator Tutorial"],
-      assignments: ["Problem Set #2", "Integration Project"],
+      description: "Mole concept, balancing equations, and yield calculations in chemical reactions.",
+      materials: ["Lecture Notes 3-4", "Stoichiometry Guide", "Limiting Reagent Tutorial"],
+      assignments: ["Stoichiometry Problem Set", "Lab Report: Reaction Yield"],
     },
     {
       id: 3,
       week: "Week 5-6",
-      title: "Linear Algebra Foundations",
+      title: "Chemical Bonding and Molecular Geometry",
       progress: 30,
       lessons: 10,
       completed: 3,
       status: "in-progress",
-      description: "Matrix operations, vector spaces, and linear transformations with practical applications.",
-      materials: ["Linear Algebra Textbook Ch. 1-3", "Matrix Calculator", "Practice Worksheets"],
-      assignments: ["Matrix Operations Quiz", "Linear Systems Project"],
+      description: "Ionic, covalent, and metallic bonding; VSEPR shapes and polarity.",
+      materials: ["Bonding Textbook Ch. 6-8", "Molecular Geometry Models", "Practice Worksheets"],
+      assignments: ["Chemical Bonding Quiz", "Lewis Structures Assignment"],
     },
     {
       id: 4,
       week: "Week 7-8",
-      title: "Differential Equations Applications",
+      title: "Gases, Thermochemistry, and Solutions",
       progress: 0,
       lessons: 8,
       completed: 0,
       status: "locked",
       description:
-        "Solving first and second-order differential equations with applications in physics and engineering.",
-      materials: ["DE Textbook Ch. 4-6", "Simulation Software", "Case Studies"],
-      assignments: ["DE Problem Set", "Real-world Application Essay"],
+        "Gas laws, enthalpy changes, calorimetry, and solution concentrations with lab applications.",
+      materials: ["Gas Laws Notes", "Thermochemistry Lab Manual", "Solution Molarity Practice"],
+      assignments: ["Gas Laws Worksheet", "Thermochemistry Lab Report"],
     },
   ]
 
@@ -270,28 +281,28 @@ export default function CoursePage() {
     ...module,
     description:
       module.id === 1
-        ? "Fundamental concepts of derivatives, limits, and continuity. Master the basic rules of differentiation."
+        ? "Structure of atoms, electron configuration, and periodic properties of elements."
         : module.id === 2
-          ? "Integration techniques including substitution, integration by parts, and applications."
+          ? "How atoms bond, molecular shapes, and how structure relates to properties."
           : module.id === 3
-            ? "Matrix operations, vector spaces, eigenvalues, and linear transformations."
-            : "First and second-order differential equations with real-world applications.",
+            ? "Behavior of gases, liquids, and solids with focus on intermolecular forces."
+            : "Energy changes in chemical reactions and thermochemical calculations.",
     materials:
       module.id === 1
-        ? ["Calculus Textbook Ch. 1-3", "Derivative Rules Sheet", "Practice Problems"]
+        ? ["General Chemistry Textbook Ch. 1-3", "Periodic Table", "Atomic Models Slides"]
         : module.id === 2
-          ? ["Integration Techniques Guide", "Practice Integrals", "Application Examples"]
+          ? ["Bonding Textbook Ch. 6-8", "Molecular Geometry Kit Guide", "Practice Problems"]
           : module.id === 3
-            ? ["Linear Algebra Notes", "Matrix Calculator", "Vector Worksheets"]
-            : ["DE Textbook Ch. 4-6", "Solution Methods Guide", "Application Cases"],
+            ? ["States of Matter Notes", "IMF Comparison Chart", "Problem Sets"]
+            : ["Thermochemistry Textbook Ch. 9-10", "Calorimetry Lab Handout", "Sample Calculations"],
     assignments:
       module.id === 1
-        ? ["Problem Set #1", "Derivatives Quiz"]
+        ? ["Atomic Structure Homework", "Quiz: Periodic Trends"]
         : module.id === 2
-          ? ["Integration Assignment", "Applications Project"]
+          ? ["Lewis Structures Assignment", "Chemical Bonding Quiz"]
           : module.id === 3
-            ? ["Matrix Quiz", "Linear Systems Project"]
-            : ["DE Problem Set", "Modeling Assignment"],
+            ? ["States of Matter Quiz", "Intermolecular Forces Worksheet"]
+            : ["Thermochemistry Problem Set", "Gas Laws Worksheet"],
   }))
 
   const currentModules = viewMode === "topics" ? enhancedModules : weeklyModules
@@ -307,8 +318,8 @@ export default function CoursePage() {
           {/* Course Header */}
           <div className="mb-6">
             <div className="flex items-center gap-3 mb-2">
-              <div className="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center">
-                <Calculator className="w-6 h-6 text-white" />
+              <div className="w-12 h-12 bg-emerald-500 rounded-lg flex items-center justify-center">
+                <FlaskConical className="w-6 h-6 text-white" />
               </div>
               <div>
                 <h1 className="text-3xl font-bold text-foreground">{courseData.name}</h1>
@@ -523,9 +534,13 @@ export default function CoursePage() {
                           {resource.type.toUpperCase()} • {resource.size}
                         </p>
                       </div>
-                      <Button variant="outline" size="sm">
-                        <Download className="w-4 h-4" />
-                      </Button>
+                      {resource.href && (
+                        <Link href={resource.href} target="_blank">
+                          <Button variant="outline" size="sm" asChild={false}>
+                            <Download className="w-4 h-4" />
+                          </Button>
+                        </Link>
+                      )}
                     </div>
                   ))}
                 </CardContent>
