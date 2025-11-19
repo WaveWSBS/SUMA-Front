@@ -4,11 +4,12 @@ from sqlalchemy.orm import Session
 from jose import jwt, JWTError
 
 from .config import settings
-from .db import SessionLocal
 from .models import User
 from .schemas import RegisterIn, LoginIn, TokenOut
 from .security import hash_password, verify_password, create_access_token, create_refresh_token
 from .init_db import init_db
+from .deps import get_db
+from .routes_ai import router as ai_router
 
 app = FastAPI(title="Suma API")
 
@@ -26,14 +27,7 @@ def on_startup():
     init_db()
 
 
-# DB session dependency
-
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+app.include_router(ai_router)
 
 
 REFRESH_COOKIE_NAME = "suma_refresh"

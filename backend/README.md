@@ -1,6 +1,6 @@
 # Suma FastAPI Backend
 
-A lightweight authentication service that powers the Suma dashboards. It ships with password registration/login, rotating refresh tokens, and an SQLite database that can be swapped for any SQLAlchemy-compatible engine.
+A lightweight authentication service that powers the Suma dashboards. It now bundles the AI Comment / assignment analysis stack from `SUMABackend`, exposing PDF analysis + RAG endpoints alongside password registration/login, rotating refresh tokens, and an SQLite database (swap for any SQLAlchemy-compatible engine when needed).
 
 > 想了解整體專案？請參考根目錄的 [`README.md`](../README.md) 或 [`README-CN.md`](../README-CN.md)。
 
@@ -28,6 +28,11 @@ The `startup` hook (`init_db`) automatically creates the database and tables whe
 | `CORS_ORIGINS` | No | `http://localhost:3000` | Comma-separated list of allowed origins. |
 | `ACCESS_TOKEN_EXPIRE_MINUTES` | No | `15` | Access token lifespan. Keep this short in production. |
 | `REFRESH_TOKEN_EXPIRE_DAYS` | No | `7` | Refresh token lifespan stored in the HttpOnly cookie. |
+| `OPENAI_API_KEY` | Yes (for AI) | — | Passed to the OpenAI SDK + LangChain integrations. |
+| `OPENAI_MODEL` | No | `gpt-4o-mini` | Override to switch the model used for structured analyses. |
+| `RAG_TEXTBOOK_DIR` | No | `<repo>/SUMABackend/RAG_textbook` | Folder containing the source PDFs used to build the vectorstore. |
+| `RAG_PERSIST_DIR` | No | `<RAG_TEXTBOOK_DIR>/chroma_db` | Where the Chroma DB is cached. |
+| `RAG_QUIZ_DIR` | No | `<RAG_TEXTBOOK_DIR>` | Directory scanned for quiz/midterm/final PDFs to estimate topic coverage. |
 
 ## Authentication Flow
 1. `POST /auth/register` hashes the submitted password with bcrypt, stores the user, returns an access token, and sets a refresh token cookie.
@@ -46,18 +51,34 @@ Refresh tokens are stored in the `suma_refresh` cookie (`HttpOnly`, `SameSite=la
 | `POST` | `/auth/refresh` | Refresh cookie | Rotate the refresh token and issue a new access token. |
 | `POST` | `/auth/logout` | Refresh cookie | Delete the refresh token cookie. |
 | `GET` | `/me` | Access token | Return `{ "user_id": <int> }`. |
+| `POST` | `/ai/analyze` | — | Upload a PDF, trigger AI-driven assignment analysis, and cache the response. |
+| `GET` | `/ai/analysis/{task_id}` | — | Fetch a cached AI comment/analysis by task id. |
+| `GET` | `/ai/analyses` | — | List all cached analyses (newest first). |
+| `POST` | `/ai/rag/build-vectorstore` | — | Build/refresh the Chroma vectorstore from textbook PDFs. |
+| `POST` | `/ai/rag/query` | — | Ask the RAG system a question about the loaded textbooks. |
+| `POST` | `/ai/rag/search` | — | Retrieve K chunks similar to the provided query. |
+| `POST` | `/ai/rag/analyze-quiz` | — | Upload a quiz PDF/text and get coverage information. |
+| `POST` | `/ai/rag/check-high-occurrence` | — | Check whether an assignment appears frequently relative to quizzes/exams. |
 
 Extend the service by adding routers under `app/` and including them in `app.main`. The frontend currently calls additional routes (e.g. `/courses`, `/tasks`) that you can implement following the same pattern.
+
+### AI & RAG endpoints in action
+1. Frontend posts a PDF to `/ai/analyze` (optional `task_id`). If the task was analyzed before, the cached analysis returns immediately; otherwise the backend calls OpenAI, tags the assignment, runs textbook/quiz retrieval, saves the result to `assignment_analyses`, and responds with the AI comment payload.
+2. `/ai/analysis/{task_id}` or `/ai/analyses` read from the same cache so teacher/student dashboards can prefetch AI Comments at page-load with zero manual clicks.
+3. `/ai/rag/*` mirrors the original SUMABackend endpoints for vector-store maintenance, ad-hoc textbook QA, quiz coverage estimation, and “high occurrence in tests” checks—ideal for background jobs or admin tooling.
 
 ## Project Structure
 ```
 backend/
 ├── app/
+│   ├── ai/               # OpenAI + RAG helpers
 │   ├── config.py      # Settings management with Pydantic
 │   ├── db.py          # SQLAlchemy engine and session handling
+│   ├── deps.py        # Shared FastAPI dependencies
 │   ├── init_db.py     # Table creation helper
 │   ├── main.py        # FastAPI application and routes
-│   ├── models.py      # SQLAlchemy models (User)
+│   ├── models.py      # SQLAlchemy models (User + assignment analyses)
+│   ├── routes_ai.py   # `/ai/...` router (assignment analyzer + RAG)
 │   ├── schemas.py     # Pydantic request/response models
 │   └── security.py    # Password hashing & JWT helpers
 ├── requirements.txt

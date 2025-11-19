@@ -3,14 +3,14 @@
 import { useEffect, useMemo, useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { Sidebar } from "@/components/sidebar"
+import { TeacherSidebar } from "@/components/sidebar-teacher"
 import { Navbar } from "@/components/navbar"
 import { AIAssistant } from "@/components/ai-assistant"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
-import { Calendar, Clock, Upload, Sparkles, BookOpen, Calculator } from "lucide-react"
+import { Calendar, Clock, Upload, Sparkles, BookOpen, Calculator, AlertCircle } from "lucide-react"
 
 // Types aligned with backend CourseOut / TaskOut
 interface CourseOut {
@@ -147,6 +147,42 @@ const courseShowcaseSamples = [
   },
 ] as const
 
+type StudentInsight = {
+  id: string
+  name: string
+  course: string
+  score?: number
+  issues: string[]
+  suggestion: string
+}
+
+const studentInsightSamples: StudentInsight[] = [
+  {
+    id: "stu-chen-1",
+    name: "陳同學",
+    course: "Precalculus",
+    score: 72,
+    issues: ["積分步驟遺漏", "符號處理不穩定"],
+    suggestion: "建議強化分段函數與極限概念，安排小測驗",
+  },
+  {
+    id: "stu-lin-2",
+    name: "林同學",
+    course: "AP Calculus BC",
+    score: 64,
+    issues: ["級數判別法選擇錯誤", "通篇計算錯誤"],
+    suggestion: "先複習級數收斂性與常見反例，分題型練習",
+  },
+  {
+    id: "stu-wu-3",
+    name: "吳同學",
+    course: "AP Calculus BC",
+    score: 83,
+    issues: ["積分換元時遺漏 du"],
+    suggestion: "加入換元步驟檢查表，作答時先寫出 u, du",
+  },
+] as const
+
 // Static class schedule for the teacher (written dead as requested)
 const teacherSchedule = [
   {
@@ -273,7 +309,7 @@ export default function TeacherDashboardPage() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <div className="flex">
-        <Sidebar collapsed={collapsed} onToggle={() => setCollapsed(!collapsed)} courseBase="teacher/course" />
+        <TeacherSidebar collapsed={collapsed} onToggle={() => setCollapsed(!collapsed)} />
         <div className="flex-1">
           <Navbar />
 
@@ -361,7 +397,7 @@ export default function TeacherDashboardPage() {
               </div>
             </div>
 
-            <Card>
+            <Card id="student-insights">
               <CardHeader className="flex flex-col gap-1">
                 <CardTitle className="text-xl">Teaching Schedule</CardTitle>
                 <p className="text-sm text-muted-foreground">結合排程與課程洞察，快速檢視進度與主題。</p>
@@ -475,7 +511,51 @@ export default function TeacherDashboardPage() {
               </CardContent>
             </Card>
 
-            {/* Your Courses section removed as requested */}
+            <Card>
+              <CardHeader className="flex flex-col gap-1">
+                <CardTitle className="text-xl">Student Insights</CardTitle>
+                <p className="text-sm text-muted-foreground">針對學生常見錯題模式與改進建議的彙整。</p>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {studentInsightSamples.map((s) => (
+                    <div key={s.id} className="flex items-start justify-between gap-4 rounded-2xl border border-border bg-muted/30 p-4">
+                      <div className="flex items-start gap-3 min-w-0">
+                        <div className="mt-1 inline-flex h-9 w-9 items-center justify-center rounded-full bg-primary/15 text-primary font-semibold">
+                          {s.name.slice(0, 1)}
+                        </div>
+                        <div className="space-y-1 min-w-0">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className="font-medium text-sm text-foreground truncate max-w-[220px]">{s.name}</span>
+                            <Badge variant="outline" className="text-xs">{s.course}</Badge>
+                            {typeof s.score === "number" && (
+                              <Badge variant="secondary" className="text-xs">Score {s.score}</Badge>
+                            )}
+                          </div>
+                          <div className="flex flex-wrap gap-2">
+                            {s.issues.map((issue) => (
+                              <Badge key={issue} variant="secondary" className="text-xs bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-200">
+                                <Sparkles className="mr-1 h-3 w-3" />
+                                {issue}
+                              </Badge>
+                            ))}
+                          </div>
+                          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                            <AlertCircle className="h-3.5 w-3.5" />
+                            {s.suggestion}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center">
+                        <Button size="sm" variant="outline" className="gap-2">
+                          檢視詳情
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>
