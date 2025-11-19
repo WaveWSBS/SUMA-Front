@@ -20,6 +20,12 @@ init_db()
 # Initialize FastAPI app
 app = FastAPI(title="Assignment Analyzer API", version="1.0.0")
 
+# Initialize OpenAI client (require key from environment)
+openai_api_key = os.getenv("OPENAI_API_KEY")
+if not openai_api_key:
+    raise RuntimeError("OPENAI_API_KEY environment variable is not set.")
+client = OpenAI(api_key=openai_api_key)
+
 # Initialize RAG system (lazy loading)
 rag_system = None
 
@@ -27,12 +33,12 @@ def get_rag_system():
     """Get or initialize RAG system."""
     global rag_system
     if rag_system is None:
-        rag_system = TextbookRAG(openai_api_key=openai_api_key)
-        try:
-            rag_system.build_vectorstore(force_rebuild=False)
-        except Exception as e:
-            print(f"Warning: Could not load RAG system: {str(e)}")
-            rag_system = None
+      rag_system = TextbookRAG(openai_api_key=openai_api_key)
+      try:
+          rag_system.build_vectorstore(force_rebuild=False)
+      except Exception as e:
+          print(f"Warning: Could not load RAG system: {str(e)}")
+          rag_system = None
     return rag_system
 
 # Initialize OpenAI client
@@ -453,4 +459,3 @@ async def build_vectorstore_endpoint(data: Dict = Body(default={"force_rebuild":
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
-
