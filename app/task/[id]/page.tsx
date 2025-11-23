@@ -1,8 +1,8 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
+import Link from "next/link"
 import { Sidebar } from "@/components/sidebar"
 import { Navbar } from "@/components/navbar"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -29,52 +29,143 @@ import {
   Sparkles,
 } from "lucide-react"
 
-const taskData = {
-  id: 1,
-  title: "Calculus Problem Set #8",
-  course: "Advanced Mathematics",
-  courseCode: "MATH 301",
-  type: "assignment",
-  dueDate: "2024-03-15",
-  dueTime: "11:59 PM",
-  points: 100,
-  status: "pending",
-  description: `Complete the following calculus problems focusing on integration techniques and applications. 
+const chemistryPdf = (filename: string) => `/files/chemistry/${encodeURIComponent(filename)}`
+
+const dummyTasks = [
+  {
+    id: 1,
+    title: "Stoichiometry Problem Set",
+    course: "Chemistry",
+    courseCode: "CHEM 101",
+    type: "assignment",
+    dueDate: "2024-03-15",
+    dueTime: "11:59 PM",
+    points: 100,
+    status: "pending",
+    description: `This problem set covers the fundamentals of stoichiometry. 
 
 **Instructions:**
-1. Show all work clearly
-2. Use proper mathematical notation
-3. Include graphs where applicable
-4. Submit as a single PDF file
+1. Balance all chemical equations.
+2. Show your work for all calculations, including unit conversions.
+3. Pay attention to significant figures.
+4. Submit your answers in a single PDF file.
 
-**Problems to solve:**
-- Integration by parts (Problems 1-5)
-- Trigonometric substitution (Problems 6-10)
-- Partial fractions (Problems 11-15)
-- Applications to area and volume (Problems 16-20)
+**Topics Covered:**
+- Mole-to-mole conversions
+- Mass-to-mass calculations
+- Limiting reactant problems
+- Percent yield calculations
 
 **Grading Criteria:**
-- Correct solutions (70%)
-- Clear work shown (20%)
-- Proper notation (10%)`,
-  tags: ["calculus", "integration", "problem-solving"],
-  attachments: [
-    {
-      id: 1,
-      name: "Problem_Set_8.pdf",
-      size: "2.3 MB",
-      type: "pdf",
-      uploadedBy: "instructor",
-    },
-    {
-      id: 2,
-      name: "Integration_Reference.pdf",
-      size: "1.8 MB",
-      type: "pdf",
-      uploadedBy: "instructor",
-    },
-  ],
-}
+- Correctly balanced equations (20%)
+- Accurate calculations (50%)
+- Correct use of significant figures (15%)
+- Clarity of work (15%)`,
+    tags: ["stoichiometry", "problem-set", "High Occurrence in tests"],
+    attachments: [
+      {
+        id: 1,
+        name: "Quiz 2 – Stoichiometry Practice.pdf",
+        size: "1.5 MB",
+        type: "pdf",
+        uploadedBy: "instructor",
+        href: chemistryPdf("Quiz 2.pdf"),
+      },
+      {
+        id: 2,
+        name: "Reference · General Chemistry Textbook",
+        size: "48.0 MB",
+        type: "pdf",
+        uploadedBy: "instructor",
+        href: chemistryPdf("textbook.pdf"),
+      },
+    ],
+  },
+  {
+    id: 2,
+    title: "Chemistry Midterm Exam",
+    course: "Chemistry",
+    courseCode: "CHEM 101",
+    type: "exam",
+    dueDate: "2024-03-18",
+    dueTime: "10:00 AM",
+    points: 200,
+    status: "pending",
+    description: `The midterm exam will cover all topics from the first half of the semester.
+
+**Instructions:**
+1. The exam is closed-book and closed-notes.
+2. A periodic table and a list of constants will be provided.
+3. You will have 90 minutes to complete the exam.
+4. The exam consists of multiple-choice and free-response questions.
+
+**Topics Covered:**
+- Atomic structure and periodicity
+- Chemical bonding and molecular geometry
+- Stoichiometry and chemical reactions
+- Gases and their properties
+
+**Grading Criteria:**
+- Multiple-choice questions (40%)
+- Free-response questions (60%)`,
+    tags: ["chemistry", "midterm", "Time Consuming"],
+    attachments: [
+      {
+        id: 1,
+        name: "Midterm-Exam.pdf",
+        size: "2.1 MB",
+        type: "pdf",
+        uploadedBy: "instructor",
+        href: chemistryPdf("Midterm-Exam.pdf"),
+      },
+      {
+        id: 2,
+        name: "Quiz 4 – Gas Laws Review",
+        size: "0.9 MB",
+        type: "pdf",
+        uploadedBy: "instructor",
+        href: chemistryPdf("Quiz 4.pdf"),
+      },
+    ],
+  },
+  {
+    id: 3,
+    title: "Atomic Structure Quiz",
+    course: "Chemistry",
+    courseCode: "CHEM 101",
+    type: "quiz",
+    dueDate: "2024-03-20",
+    dueTime: "2:00 PM",
+    points: 50,
+    status: "pending",
+    description: `A short quiz on atomic structure and electron configurations.
+
+**Instructions:**
+1. The quiz will be 20 minutes long.
+2. It will consist of 10 multiple-choice questions.
+3. No calculators are allowed.
+
+**Topics Covered:**
+- Protons, neutrons, and electrons
+- Isotopes and atomic mass
+- Electron configurations and orbital diagrams
+- Quantum numbers
+
+**Grading Criteria:**
+- Each question is worth 5 points.`,
+    tags: ["chemistry", "quiz", "Practice Recommended"],
+    attachments: [
+      {
+        id: 1,
+        name: "Quiz 1 – Atomic Structure.pdf",
+        size: "0.8 MB",
+        type: "pdf",
+        uploadedBy: "instructor",
+        href: chemistryPdf("Quiz 1.pdf"),
+      },
+    ],
+  },
+]
 
 const submissionHistory = [
   {
@@ -87,12 +178,14 @@ const submissionHistory = [
   },
 ]
 
-export default function TaskPage() {
+export default function TaskPage({ params }: { params: { id: string } }) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [submissionText, setSubmissionText] = useState("")
   const [aiQuery, setAiQuery] = useState("")
   const [isAiLoading, setIsAiLoading] = useState(false)
   const [aiResponse, setAiResponse] = useState("")
+
+  const taskData = dummyTasks.find((task) => task.id.toString() === params.id)
 
   const handleAiSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -102,28 +195,24 @@ export default function TaskPage() {
     // Simulate AI response
     setTimeout(() => {
       setAiResponse(
-        `Based on the attached Problem Set #8, I can see this assignment focuses on advanced integration techniques. Here's a summary:
-
-**Key Topics:**
-- Integration by parts: Use the formula ∫u dv = uv - ∫v du
-- Trigonometric substitution: For expressions with √(a²-x²), √(a²+x²), √(x²-a²)
-- Partial fractions: Decompose rational functions before integrating
-- Applications: Calculate areas between curves and volumes of revolution
-
-**Recommended Approach:**
-1. Start with problems 1-5 (integration by parts) as they build foundational skills
-2. Review trigonometric identities before tackling problems 6-10
-3. Practice partial fraction decomposition separately before problems 11-15
-4. Use graphing tools to visualize the applications in problems 16-20
-
-**Study Tips:**
-- Keep the integration reference sheet handy
-- Double-check your work by differentiating your answers
-- Pay attention to constants of integration`,
+        `Based on the attached documents, I can provide some analysis. What would you like to know?`,
       )
       setIsAiLoading(false)
       setAiQuery("")
     }, 2000)
+  }
+
+  if (!taskData) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-4xl font-bold">Task Not Found</h1>
+          <p className="text-muted-foreground">
+            The task you are looking for does not exist.
+          </p>
+        </div>
+      </div>
+    )
   }
 
   const getStatusColor = (status: string) => {
@@ -245,12 +334,22 @@ export default function TaskPage() {
                         </p>
                       </div>
                       <div className="flex gap-2">
-                        <Button variant="outline" size="sm">
-                          <Eye className="w-4 h-4" />
-                        </Button>
-                        <Button variant="outline" size="sm">
-                          <Download className="w-4 h-4" />
-                        </Button>
+                        {attachment.href ? (
+                          <>
+                            <Button variant="outline" size="sm" asChild>
+                              <Link href={attachment.href} target="_blank" rel="noopener noreferrer">
+                                <Eye className="w-4 h-4" />
+                              </Link>
+                            </Button>
+                            <Button variant="outline" size="sm" asChild>
+                              <Link href={attachment.href} target="_blank" rel="noopener noreferrer" download>
+                                <Download className="w-4 h-4" />
+                              </Link>
+                            </Button>
+                          </>
+                        ) : (
+                          <span className="text-xs text-muted-foreground">File unavailable</span>
+                        )}
                       </div>
                     </div>
                   ))}
@@ -350,7 +449,7 @@ export default function TaskPage() {
                     </label>
                     <Textarea
                       value={submissionText}
-                      onChange={(e) => setSubmissionText(e.target.value)}
+                      onChange={(e) => setSubmissionText(e.g.target.value)}
                       placeholder="Add any additional comments or explanations..."
                       className="min-h-[100px] bg-muted border-0"
                     />

@@ -21,7 +21,6 @@ import {
   Download,
   MessageSquare,
   BarChart3,
-  Calculator,
   Users,
   MapPin,
   ChevronDown,
@@ -33,7 +32,10 @@ import {
   FlaskConical,
 } from "lucide-react"
 
-const courseData = {
+const chemistryPdf = (filename: string) => `/files/chemistry/${encodeURIComponent(filename)}`
+
+// --- Unified Dummy Data for the Course Page ---
+const coursePageData = {
   id: 1,
   name: "General Chemistry",
   code: "CHEM 101",
@@ -49,182 +51,85 @@ const courseData = {
     zoomLink: "https://zoom.us/j/123456789",
     avatar: "/placeholder.svg?height=64&width=64",
   },
-}
-
-const upcomingTasks = [
-  {
-    id: 1,
-    title: "Stoichiometry Problem Set",
-    type: "assignment",
-    dueDate: "2024-03-15",
-    dueTime: "11:59 PM",
-    status: "pending",
-    points: 100,
-    aiComment: "High Occurrence in tests",
-  },
-  {
-    id: 2,
-    title: "Chemistry Midterm Exam",
-    type: "exam",
-    dueDate: "2024-03-18",
-    dueTime: "10:00 AM",
-    status: "upcoming",
-    points: 200,
-    aiComment: "Time Consuming",
-  },
-  {
-    id: 3,
-    title: "Atomic Structure Quiz",
-    type: "quiz",
-    dueDate: "2024-03-20",
-    dueTime: "2:00 PM",
-    status: "upcoming",
-    points: 50,
-    aiComment: "Practice Recommended",
-  },
-]
-
-const modules = [
-  {
-    id: 1,
-    title: "Atomic Structure and Periodicity",
-    progress: 100,
-    lessons: 8,
-    completed: 8,
-    status: "completed",
-  },
-  {
-    id: 2,
-    title: "Chemical Bonding and Molecular Geometry",
-    progress: 75,
-    lessons: 6,
-    completed: 4,
-    status: "in-progress",
-  },
-  {
-    id: 3,
-    title: "States of Matter and Intermolecular Forces",
-    progress: 30,
-    lessons: 10,
-    completed: 3,
-    status: "in-progress",
-  },
-  {
-    id: 4,
-    title: "Thermochemistry and Chemical Reactions",
-    progress: 0,
-    lessons: 8,
-    completed: 0,
-    status: "locked",
-  },
-]
-
-const resources = [
-  {
-    id: 1,
-    name: "CHEM 101 Syllabus",
-    type: "pdf",
-    size: "2.0 MB",
-    href: undefined,
-  },
-  {
-    id: 2,
-    name: "Textbook: General Chemistry",
-    type: "pdf",
-    size: "48.0 MB",
-    href: "/pdfs/chemistry/textbook.pdf",
-  },
-]
-
-const attendanceData = [
-  { date: "2024-03-01", status: "present" },
-  { date: "2024-03-04", status: "present" },
-  { date: "2024-03-06", status: "absent" },
-  { date: "2024-03-08", status: "present" },
-  { date: "2024-03-11", status: "present" },
-  { date: "2024-03-13", status: "late" },
-]
-
-const grades = [
-  { assignment: "Stoichiometry Problem Set", score: 95, total: 100, weight: "10%" },
-  { assignment: "Atomic Structure Homework", score: 88, total: 100, weight: "10%" },
-  { assignment: "Quiz: Chemical Bonding", score: 42, total: 50, weight: "5%" },
-  { assignment: "Gas Laws Worksheet", score: 92, total: 100, weight: "10%" },
-  { assignment: "Midterm Exam", score: null, total: 200, weight: "25%" },
-]
-
-const discussions = [
-  {
-    id: 1,
-    title: "Question about Integration by Parts",
-    author: "Alex Chen",
-    replies: 3,
-    lastActivity: "2 hours ago",
-    isAnswered: true,
-  },
-  {
-    id: 2,
-    title: "Study Group for Midterm",
-    author: "Maria Rodriguez",
-    replies: 8,
-    lastActivity: "5 hours ago",
-    isAnswered: false,
-  },
-  {
-    id: 3,
-    title: "Clarification on Problem Set #7",
-    author: "John Smith",
-    replies: 1,
-    lastActivity: "1 day ago",
-    isAnswered: true,
-  },
-]
-
-export default function CoursePage() {
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
-  const [viewMode, setViewMode] = useState<"topics" | "weeks">("topics")
-  const [expandedModules, setExpandedModules] = useState<number[]>([])
-
-  const getTaskTypeColor = (type: string) => {
-    switch (type) {
-      case "assignment":
-        return "bg-blue-500"
-      case "exam":
-        return "bg-red-500"
-      case "quiz":
-        return "bg-green-500"
-      case "project":
-        return "bg-purple-500"
-      default:
-        return "bg-gray-500"
-    }
-  }
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "present":
-        return "bg-green-500"
-      case "absent":
-        return "bg-red-500"
-      case "late":
-        return "bg-orange-500"
-      default:
-        return "bg-gray-500"
-    }
-  }
-
-  const calculateOverallGrade = () => {
-    const completedGrades = grades.filter((g) => g.score !== null)
-    const totalPoints = completedGrades.reduce((sum, g) => sum + g.score, 0)
-    const maxPoints = completedGrades.reduce((sum, g) => sum + g.total, 0)
-    return Math.round((totalPoints / maxPoints) * 100)
-  }
-
-  const toggleModuleDropdown = (moduleId: number) => {
-    setExpandedModules((prev) => (prev.includes(moduleId) ? prev.filter((id) => id !== moduleId) : [...prev, moduleId]))
-  }
-
-  const weeklyModules = [
+  upcomingTasks: [
+    {
+      id: 1,
+      title: "Stoichiometry Problem Set",
+      type: "assignment",
+      dueDate: "2024-03-15",
+      dueTime: "11:59 PM",
+      status: "pending",
+      points: 100,
+      aiComment: "High Occurrence in tests",
+    },
+    {
+      id: 2,
+      title: "Chemistry Midterm Exam",
+      type: "exam",
+      dueDate: "2024-03-18",
+      dueTime: "10:00 AM",
+      status: "upcoming",
+      points: 200,
+      aiComment: "Time Consuming",
+    },
+    {
+      id: 3,
+      title: "Atomic Structure Quiz",
+      type: "quiz",
+      dueDate: "2024-03-20",
+      dueTime: "2:00 PM",
+      status: "upcoming",
+      points: 50,
+      aiComment: "Practice Recommended",
+    },
+  ],
+  modulesByTopic: [
+    {
+      id: 1,
+      title: "Atomic Structure and Periodicity",
+      progress: 100,
+      lessons: 8,
+      completed: 8,
+      status: "completed",
+      description: "Structure of atoms, electron configuration, and periodic properties of elements.",
+      materials: ["General Chemistry Textbook Ch. 1-3", "Periodic Table", "Atomic Models Slides"],
+      assignments: ["Atomic Structure Homework", "Quiz: Periodic Trends"],
+    },
+    {
+      id: 2,
+      title: "Chemical Bonding and Molecular Geometry",
+      progress: 75,
+      lessons: 6,
+      completed: 4,
+      status: "in-progress",
+      description: "How atoms bond, molecular shapes, and how structure relates to properties.",
+      materials: ["Bonding Textbook Ch. 6-8", "Molecular Geometry Kit Guide", "Practice Problems"],
+      assignments: ["Lewis Structures Assignment", "Chemical Bonding Quiz"],
+    },
+    {
+      id: 3,
+      title: "States of Matter and Intermolecular Forces",
+      progress: 30,
+      lessons: 10,
+      completed: 3,
+      status: "in-progress",
+      description: "Behavior of gases, liquids, and solids with focus on intermolecular forces.",
+      materials: ["States of Matter Notes", "IMF Comparison Chart", "Problem Sets"],
+      assignments: ["States of Matter Quiz", "Intermolecular Forces Worksheet"],
+    },
+    {
+      id: 4,
+      title: "Thermochemistry and Chemical Reactions",
+      progress: 0,
+      lessons: 8,
+      completed: 0,
+      status: "locked",
+      description: "Energy changes in chemical reactions and thermochemical calculations.",
+      materials: ["Thermochemistry Textbook Ch. 9-10", "Calorimetry Lab Handout", "Sample Calculations"],
+      assignments: ["Thermochemistry Problem Set", "Gas Laws Worksheet"],
+    },
+  ],
+  modulesByWeek: [
     {
       id: 1,
       week: "Week 1-2",
@@ -233,8 +138,7 @@ export default function CoursePage() {
       lessons: 8,
       completed: 8,
       status: "completed",
-      description:
-        "Fundamental concepts of atoms, isotopes, and the periodic table. Learn how elements are organized.",
+      description: "Fundamental concepts of atoms, isotopes, and the periodic table. Learn how elements are organized.",
       materials: ["Lecture Notes 1-2", "Video: Atomic Models", "Practice Problems Set A"],
       assignments: ["Atomic Structure Homework", "Quiz: Periodic Trends"],
     },
@@ -270,42 +174,171 @@ export default function CoursePage() {
       lessons: 8,
       completed: 0,
       status: "locked",
-      description:
-        "Gas laws, enthalpy changes, calorimetry, and solution concentrations with lab applications.",
+      description: "Gas laws, enthalpy changes, calorimetry, and solution concentrations with lab applications.",
       materials: ["Gas Laws Notes", "Thermochemistry Lab Manual", "Solution Molarity Practice"],
       assignments: ["Gas Laws Worksheet", "Thermochemistry Lab Report"],
     },
-  ]
+  ],
+  resources: [
+    {
+      id: 1,
+      name: "CHEM 101 Syllabus",
+      type: "pdf",
+      size: "2.0 MB",
+    },
+    {
+      id: 2,
+      name: "General Chemistry Textbook",
+      type: "pdf",
+      size: "48.0 MB",
+      href: chemistryPdf("textbook.pdf"),
+    },
+    {
+      id: 3,
+      name: "Midterm Exam Archive (Form A)",
+      type: "pdf",
+      size: "1.8 MB",
+      href: chemistryPdf("Midterm-Exam.pdf"),
+    },
+    {
+      id: 4,
+      name: "Final Exam Archive",
+      type: "pdf",
+      size: "2.2 MB",
+      href: chemistryPdf("Final-Exam.pdf"),
+    },
+    {
+      id: 5,
+      name: "Quiz 1 – Atomic Structure",
+      type: "pdf",
+      size: "0.8 MB",
+      href: chemistryPdf("Quiz 1.pdf"),
+    },
+    {
+      id: 6,
+      name: "Quiz 2 – Stoichiometry",
+      type: "pdf",
+      size: "0.9 MB",
+      href: chemistryPdf("Quiz 2.pdf"),
+    },
+    {
+      id: 7,
+      name: "Quiz 3 – Bonding Models",
+      type: "pdf",
+      size: "0.9 MB",
+      href: chemistryPdf("Quiz 3.pdf"),
+    },
+    {
+      id: 8,
+      name: "Quiz 4 – States of Matter",
+      type: "pdf",
+      size: "0.9 MB",
+      href: chemistryPdf("Quiz 4.pdf"),
+    },
+    {
+      id: 9,
+      name: "Quiz 5 – Thermochemistry",
+      type: "pdf",
+      size: "1.0 MB",
+      href: chemistryPdf("Quiz 5.pdf"),
+    },
+  ],
+  attendance: {
+    warning: "You can only skip 5 more classes to not lose 10% of your GPA",
+    records: [
+      { date: "2024-03-01", status: "present" },
+      { date: "2024-03-04", status: "present" },
+      { date: "2024-03-06", status: "absent" },
+      { date: "2024-03-08", status: "present" },
+      { date: "2024-03-11", status: "present" },
+      { date: "2024-03-13", status: "late" },
+    ],
+  },
+  grades: {
+    overall: 0, // Will be calculated
+    breakdown: [
+      { assignment: "Stoichiometry Problem Set", score: 95, total: 100, weight: "10%" },
+      { assignment: "Atomic Structure Homework", score: 88, total: 100, weight: "10%" },
+      { assignment: "Quiz: Chemical Bonding", score: 42, total: 50, weight: "5%" },
+      { assignment: "Gas Laws Worksheet", score: 92, total: 100, weight: "10%" },
+      { assignment: "Midterm Exam", score: null, total: 200, weight: "25%" },
+    ],
+  },
+  discussions: [
+    {
+      id: 1,
+      title: "Question about Integration by Parts",
+      author: "Alex Chen",
+      replies: 3,
+      lastActivity: "2 hours ago",
+      isAnswered: true,
+    },
+    {
+      id: 2,
+      title: "Study Group for Midterm",
+      author: "Maria Rodriguez",
+      replies: 8,
+      lastActivity: "5 hours ago",
+      isAnswered: false,
+    },
+    {
+      id: 3,
+      title: "Clarification on Problem Set #7",
+      author: "John Smith",
+      replies: 1,
+      lastActivity: "1 day ago",
+      isAnswered: true,
+    },
+  ],
+}
+// --- End of Dummy Data ---
 
-  const enhancedModules = modules.map((module) => ({
-    ...module,
-    description:
-      module.id === 1
-        ? "Structure of atoms, electron configuration, and periodic properties of elements."
-        : module.id === 2
-          ? "How atoms bond, molecular shapes, and how structure relates to properties."
-          : module.id === 3
-            ? "Behavior of gases, liquids, and solids with focus on intermolecular forces."
-            : "Energy changes in chemical reactions and thermochemical calculations.",
-    materials:
-      module.id === 1
-        ? ["General Chemistry Textbook Ch. 1-3", "Periodic Table", "Atomic Models Slides"]
-        : module.id === 2
-          ? ["Bonding Textbook Ch. 6-8", "Molecular Geometry Kit Guide", "Practice Problems"]
-          : module.id === 3
-            ? ["States of Matter Notes", "IMF Comparison Chart", "Problem Sets"]
-            : ["Thermochemistry Textbook Ch. 9-10", "Calorimetry Lab Handout", "Sample Calculations"],
-    assignments:
-      module.id === 1
-        ? ["Atomic Structure Homework", "Quiz: Periodic Trends"]
-        : module.id === 2
-          ? ["Lewis Structures Assignment", "Chemical Bonding Quiz"]
-          : module.id === 3
-            ? ["States of Matter Quiz", "Intermolecular Forces Worksheet"]
-            : ["Thermochemistry Problem Set", "Gas Laws Worksheet"],
-  }))
+export default function CoursePage() {
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+  const [viewMode, setViewMode] = useState<"topics" | "weeks">("topics")
+  const [expandedModules, setExpandedModules] = useState<number[]>([])
 
-  const currentModules = viewMode === "topics" ? enhancedModules : weeklyModules
+  const getTaskTypeColor = (type: string) => {
+    switch (type) {
+      case "assignment":
+        return "bg-blue-500"
+      case "exam":
+        return "bg-red-500"
+      case "quiz":
+        return "bg-green-500"
+      case "project":
+        return "bg-purple-500"
+      default:
+        return "bg-gray-500"
+    }
+  }
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "present":
+        return "bg-green-500"
+      case "absent":
+        return "bg-red-500"
+      case "late":
+        return "bg-orange-500"
+      default:
+        return "bg-gray-500"
+    }
+  }
+
+  const calculateOverallGrade = () => {
+    const completedGrades = coursePageData.grades.breakdown.filter((g) => g.score !== null)
+    if (completedGrades.length === 0) return 0
+    const totalPoints = completedGrades.reduce((sum, g) => sum + (g.score || 0), 0)
+    const maxPoints = completedGrades.reduce((sum, g) => sum + g.total, 0)
+    return Math.round((totalPoints / maxPoints) * 100)
+  }
+
+  const toggleModuleDropdown = (moduleId: number) => {
+    setExpandedModules((prev) => (prev.includes(moduleId) ? prev.filter((id) => id !== moduleId) : [...prev, moduleId]))
+  }
+
+  const currentModules = viewMode === "topics" ? coursePageData.modulesByTopic : coursePageData.modulesByWeek
 
   return (
     <div className="min-h-screen bg-background flex">
@@ -322,13 +355,13 @@ export default function CoursePage() {
                 <FlaskConical className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-3xl font-bold text-foreground">{courseData.name}</h1>
+                <h1 className="text-3xl font-bold text-foreground">{coursePageData.name}</h1>
                 <p className="text-muted-foreground">
-                  {courseData.code} • {courseData.semester} • {courseData.credits} Credits
+                  {coursePageData.code} • {coursePageData.semester} • {coursePageData.credits} Credits
                 </p>
               </div>
             </div>
-            <p className="text-muted-foreground max-w-2xl">{courseData.description}</p>
+            <p className="text-muted-foreground max-w-2xl">{coursePageData.description}</p>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
@@ -343,7 +376,7 @@ export default function CoursePage() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                  {upcomingTasks.map((task) => (
+                  {coursePageData.upcomingTasks.map((task) => (
                     <div key={task.id} className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
                       <div className={`w-3 h-3 rounded-full ${getTaskTypeColor(task.type)}`} />
                       <div className="flex-1">
@@ -357,10 +390,12 @@ export default function CoursePage() {
                           <Badge variant="secondary" className="text-xs">
                             {task.points} pts
                           </Badge>
-                          <div className="flex items-center gap-1 px-2 py-1 bg-purple-100 dark:bg-purple-900/30 rounded-full">
-                            <Sparkles className="w-3 h-3 text-purple-600 dark:text-purple-400" />
-                            <span className="text-xs text-purple-700 dark:text-purple-300">{task.aiComment}</span>
-                          </div>
+                          {task.aiComment && (
+                            <div className="flex items-center gap-1 px-2 py-1 bg-purple-100 dark:bg-purple-900/30 rounded-full">
+                              <Sparkles className="w-3 h-3 text-purple-600 dark:text-purple-400" />
+                              <span className="text-xs text-purple-700 dark:text-purple-300">{task.aiComment}</span>
+                            </div>
+                          )}
                         </div>
                         <p className="text-sm text-muted-foreground">
                           Due: {new Date(task.dueDate).toLocaleDateString()} at {task.dueTime}
@@ -414,7 +449,7 @@ export default function CoursePage() {
                       <div key={module.id} className="p-4 rounded-lg bg-muted/50 border">
                         <div className="flex items-center justify-between mb-2">
                           <h3 className="font-medium text-card-foreground">
-                            {viewMode === "weeks" ? `${module.week}: ${module.title}` : module.title}
+                            {viewMode === "weeks" && module.week ? `${module.week}: ${module.title}` : module.title}
                           </h3>
                           <div className="flex items-center gap-2">
                             <Badge
@@ -525,7 +560,7 @@ export default function CoursePage() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                  {resources.map((resource) => (
+                  {coursePageData.resources.map((resource) => (
                     <div key={resource.id} className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
                       <FileText className="w-5 h-5 text-muted-foreground" />
                       <div className="flex-1">
@@ -555,7 +590,7 @@ export default function CoursePage() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                  {discussions.map((discussion) => (
+                  {coursePageData.discussions.map((discussion) => (
                     <div key={discussion.id} className="p-3 rounded-lg bg-muted/50">
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
@@ -596,13 +631,13 @@ export default function CoursePage() {
                   <div className="flex items-center gap-3">
                     <Avatar className="h-12 w-12">
                       <AvatarImage
-                        src={courseData.professor.avatar || "/placeholder.svg"}
-                        alt={courseData.professor.name}
+                        src={coursePageData.professor.avatar || "/placeholder.svg"}
+                        alt={coursePageData.professor.name}
                       />
                       <AvatarFallback>SJ</AvatarFallback>
                     </Avatar>
                     <div>
-                      <h3 className="font-medium text-card-foreground">{courseData.professor.name}</h3>
+                      <h3 className="font-medium text-card-foreground">{coursePageData.professor.name}</h3>
                       <p className="text-sm text-muted-foreground">Course Instructor</p>
                     </div>
                   </div>
@@ -610,19 +645,19 @@ export default function CoursePage() {
                   <div className="space-y-2 text-sm">
                     <div className="flex items-center gap-2">
                       <Mail className="w-4 h-4 text-muted-foreground" />
-                      <span className="text-card-foreground">{courseData.professor.email}</span>
+                      <span className="text-card-foreground">{coursePageData.professor.email}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <Phone className="w-4 h-4 text-muted-foreground" />
-                      <span className="text-card-foreground">{courseData.professor.phone}</span>
+                      <span className="text-card-foreground">{coursePageData.professor.phone}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <MapPin className="w-4 h-4 text-muted-foreground" />
-                      <span className="text-card-foreground">{courseData.professor.office}</span>
+                      <span className="text-card-foreground">{coursePageData.professor.office}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <Clock className="w-4 h-4 text-muted-foreground" />
-                      <span className="text-card-foreground">{courseData.professor.officeHours}</span>
+                      <span className="text-card-foreground">{coursePageData.professor.officeHours}</span>
                     </div>
                   </div>
 
@@ -648,7 +683,7 @@ export default function CoursePage() {
                   </div>
 
                   <div className="space-y-2">
-                    {grades.map((grade, index) => (
+                    {coursePageData.grades.breakdown.map((grade, index) => (
                       <div key={index} className="flex justify-between items-center text-sm">
                         <span className="text-muted-foreground truncate">{grade.assignment}</span>
                         <div className="flex items-center gap-2">
@@ -678,13 +713,13 @@ export default function CoursePage() {
                     <div className="flex items-center gap-2">
                       <div className="w-2 h-2 rounded-full bg-orange-500" />
                       <span className="text-sm font-medium text-orange-800 dark:text-orange-200">
-                        You can only skip 5 more classes to not lose 10% of your GPA
+                        {coursePageData.attendance.warning}
                       </span>
                     </div>
                   </div>
 
                   <div className="grid grid-cols-6 gap-2">
-                    {attendanceData.map((record, index) => (
+                    {coursePageData.attendance.records.map((record, index) => (
                       <div
                         key={index}
                         className={`w-6 h-6 rounded-full ${getStatusColor(record.status)}`}
