@@ -28,144 +28,8 @@ import {
   Trash2,
   Sparkles,
 } from "lucide-react"
-
-const chemistryPdf = (filename: string) => `/files/chemistry/${encodeURIComponent(filename)}`
-
-const dummyTasks = [
-  {
-    id: 1,
-    title: "Stoichiometry Problem Set",
-    course: "Chemistry",
-    courseCode: "CHEM 101",
-    type: "assignment",
-    dueDate: "2024-03-15",
-    dueTime: "11:59 PM",
-    points: 100,
-    status: "pending",
-    description: `This problem set covers the fundamentals of stoichiometry. 
-
-**Instructions:**
-1. Balance all chemical equations.
-2. Show your work for all calculations, including unit conversions.
-3. Pay attention to significant figures.
-4. Submit your answers in a single PDF file.
-
-**Topics Covered:**
-- Mole-to-mole conversions
-- Mass-to-mass calculations
-- Limiting reactant problems
-- Percent yield calculations
-
-**Grading Criteria:**
-- Correctly balanced equations (20%)
-- Accurate calculations (50%)
-- Correct use of significant figures (15%)
-- Clarity of work (15%)`,
-    tags: ["stoichiometry", "problem-set", "High Occurrence in tests"],
-    attachments: [
-      {
-        id: 1,
-        name: "Quiz 2 – Stoichiometry Practice.pdf",
-        size: "1.5 MB",
-        type: "pdf",
-        uploadedBy: "instructor",
-        href: chemistryPdf("Quiz 2.pdf"),
-      },
-      {
-        id: 2,
-        name: "Reference · General Chemistry Textbook",
-        size: "48.0 MB",
-        type: "pdf",
-        uploadedBy: "instructor",
-        href: chemistryPdf("textbook.pdf"),
-      },
-    ],
-  },
-  {
-    id: 2,
-    title: "Chemistry Midterm Exam",
-    course: "Chemistry",
-    courseCode: "CHEM 101",
-    type: "exam",
-    dueDate: "2024-03-18",
-    dueTime: "10:00 AM",
-    points: 200,
-    status: "pending",
-    description: `The midterm exam will cover all topics from the first half of the semester.
-
-**Instructions:**
-1. The exam is closed-book and closed-notes.
-2. A periodic table and a list of constants will be provided.
-3. You will have 90 minutes to complete the exam.
-4. The exam consists of multiple-choice and free-response questions.
-
-**Topics Covered:**
-- Atomic structure and periodicity
-- Chemical bonding and molecular geometry
-- Stoichiometry and chemical reactions
-- Gases and their properties
-
-**Grading Criteria:**
-- Multiple-choice questions (40%)
-- Free-response questions (60%)`,
-    tags: ["chemistry", "midterm", "Time Consuming"],
-    attachments: [
-      {
-        id: 1,
-        name: "Midterm-Exam.pdf",
-        size: "2.1 MB",
-        type: "pdf",
-        uploadedBy: "instructor",
-        href: chemistryPdf("Midterm-Exam.pdf"),
-      },
-      {
-        id: 2,
-        name: "Quiz 4 – Gas Laws Review",
-        size: "0.9 MB",
-        type: "pdf",
-        uploadedBy: "instructor",
-        href: chemistryPdf("Quiz 4.pdf"),
-      },
-    ],
-  },
-  {
-    id: 3,
-    title: "Atomic Structure Quiz",
-    course: "Chemistry",
-    courseCode: "CHEM 101",
-    type: "quiz",
-    dueDate: "2024-03-20",
-    dueTime: "2:00 PM",
-    points: 50,
-    status: "pending",
-    description: `A short quiz on atomic structure and electron configurations.
-
-**Instructions:**
-1. The quiz will be 20 minutes long.
-2. It will consist of 10 multiple-choice questions.
-3. No calculators are allowed.
-
-**Topics Covered:**
-- Protons, neutrons, and electrons
-- Isotopes and atomic mass
-- Electron configurations and orbital diagrams
-- Quantum numbers
-
-**Grading Criteria:**
-- Each question is worth 5 points.`,
-    tags: ["chemistry", "quiz", "Practice Recommended"],
-    attachments: [
-      {
-        id: 1,
-        name: "Quiz 1 – Atomic Structure.pdf",
-        size: "0.8 MB",
-        type: "pdf",
-        uploadedBy: "instructor",
-        href: chemistryPdf("Quiz 1.pdf"),
-      },
-    ],
-  },
-]
+import { AiCommentChip } from "@/components/ai-comment-chip"
+import { getDummyTaskById } from "@/data/dummy-tasks"
 
 const submissionHistory = [
   {
@@ -185,7 +49,7 @@ export default function TaskPage({ params }: { params: { id: string } }) {
   const [isAiLoading, setIsAiLoading] = useState(false)
   const [aiResponse, setAiResponse] = useState("")
 
-  const taskData = dummyTasks.find((task) => task.id.toString() === params.id)
+  const taskData = getDummyTaskById(params.id)
 
   const handleAiSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -287,7 +151,7 @@ export default function TaskPage({ params }: { params: { id: string } }) {
             </div>
 
             {/* Tags */}
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <Tag className="w-4 h-4 text-muted-foreground" />
               {taskData.tags.map((tag) => (
                 <Badge key={tag} variant="secondary" className="text-xs">
@@ -295,6 +159,11 @@ export default function TaskPage({ params }: { params: { id: string } }) {
                 </Badge>
               ))}
             </div>
+            {taskData.description && (
+              <div className="mt-3">
+                <AiCommentChip taskId={taskData.id} assignmentText={taskData.description} variant="block" />
+              </div>
+            )}
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -449,7 +318,7 @@ export default function TaskPage({ params }: { params: { id: string } }) {
                     </label>
                     <Textarea
                       value={submissionText}
-                      onChange={(e) => setSubmissionText(e.g.target.value)}
+                      onChange={(e) => setSubmissionText(e.target.value)}
                       placeholder="Add any additional comments or explanations..."
                       className="min-h-[100px] bg-muted border-0"
                     />

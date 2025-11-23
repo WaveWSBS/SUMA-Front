@@ -11,6 +11,8 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { Textarea } from "@/components/ui/textarea"
+import { AiCommentChip } from "@/components/ai-comment-chip"
+import { getDummyTaskById } from "@/data/dummy-tasks"
 import {
   Calendar,
   Clock,
@@ -25,40 +27,27 @@ import {
   BookOpen,
   FileText,
   Upload,
-  Sparkles,
 } from "lucide-react"
 
 // Local mock data used by the dashboard UI
 const todaysTasks = [
   {
-    id: 1,
-    title: "Math Assignment #5",
-    course: "Mathematics",
-    type: "assignment",
-    dueTime: "11:59 PM",
-    status: "pending",
-    points: 100,
-    aiComment: "High Occurrence in tests",
-  },
-  {
     id: 2,
-    title: "Physics Lab Report",
-    course: "Physics",
-    type: "lab",
-    dueTime: "2:00 PM",
-    status: "submitted",
-    points: 50,
-    aiComment: "Time Consuming",
+    title: "Chemistry Midterm Exam",
+    course: "Chemistry",
+    type: "exam",
+    dueTime: "10:00 AM",
+    status: "pending",
+    points: 200,
   },
   {
     id: 3,
-    title: "CS Project Demo",
-    course: "Computer Science",
-    type: "project",
-    dueTime: "3:30 PM",
+    title: "Redox Reactions Assignment",
+    course: "Chemistry",
+    type: "assignment",
+    dueTime: "11:59 PM",
     status: "pending",
-    points: 30,
-    aiComment: "Practice Recommended",
+    points: 80,
   },
 ]
 
@@ -203,37 +192,39 @@ function DashboardUI() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                  {todaysTasks.map((task) => (
-                    <div key={task.id} className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
-                      <div className={`w-3 h-3 rounded-full ${getTaskTypeColor(task.type)}`} />
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <span className="font-medium text-card-foreground">{task.title}</span>
-                          <Badge variant="outline" className="text-xs">
-                            {task.course}
-                          </Badge>
-                          <Badge variant="secondary" className="text-xs">
-                            {task.points} pts
-                          </Badge>
-                          <div className="flex items-center gap-1 px-2 py-1 bg-purple-100 dark:bg-purple-900/30 rounded-full">
-                            <Sparkles className="w-3 h-3 text-purple-600 dark:text-purple-400" />
-                            <span className="text-xs text-purple-700 dark:text-purple-300">{task.aiComment}</span>
+                  {todaysTasks.map((task) => {
+                    const assignment = getDummyTaskById(task.id)
+                    return (
+                      <div key={task.id} className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+                        <div className={`w-3 h-3 rounded-full ${getTaskTypeColor(task.type)}`} />
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="font-medium text-card-foreground">{task.title}</span>
+                            <Badge variant="outline" className="text-xs">
+                              {task.course}
+                            </Badge>
+                            <Badge variant="secondary" className="text-xs">
+                              {task.points} pts
+                            </Badge>
+                            {assignment?.description && (
+                              <AiCommentChip taskId={task.id} assignmentText={assignment.description} />
+                            )}
                           </div>
+                          <p className="text-sm text-muted-foreground">Due: {task.dueTime}</p>
                         </div>
-                        <p className="text-sm text-muted-foreground">Due: {task.dueTime}</p>
+                        {task.status === "submitted" ? (
+                          <CheckCircle className="w-5 h-5 text-green-500" />
+                        ) : (
+                          <Link href={`/task/${task.id}#submission`}>
+                            <Button variant="outline" size="sm" className="gap-2">
+                              <Upload className="w-4 h-4" />
+                              Submit
+                            </Button>
+                          </Link>
+                        )}
                       </div>
-                      {task.status === "submitted" ? (
-                        <CheckCircle className="w-5 h-5 text-green-500" />
-                      ) : (
-                        <Link href={`/task/${task.id}#submission`}>
-                          <Button variant="outline" size="sm" className="gap-2">
-                            <Upload className="w-4 h-4" />
-                            Submit
-                          </Button>
-                        </Link>
-                      )}
-                    </div>
-                  ))}
+                    )
+                  })}
                 </CardContent>
               </Card>
             </div>

@@ -9,6 +9,9 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { AiCommentChip } from "@/components/ai-comment-chip"
+import { getDummyTaskById } from "@/data/dummy-tasks"
+import { chemistryPdf } from "@/lib/chemistry"
 import {
   Clock,
   BookOpen,
@@ -28,11 +31,8 @@ import {
   Upload,
   Calendar,
   Grid3X3,
-  Sparkles,
   FlaskConical,
 } from "lucide-react"
-
-const chemistryPdf = (filename: string) => `/files/chemistry/${encodeURIComponent(filename)}`
 
 // --- Unified Dummy Data for the Course Page ---
 const coursePageData = {
@@ -52,16 +52,7 @@ const coursePageData = {
     avatar: "/placeholder.svg?height=64&width=64",
   },
   upcomingTasks: [
-    {
-      id: 1,
-      title: "Stoichiometry Problem Set",
-      type: "assignment",
-      dueDate: "2024-03-15",
-      dueTime: "11:59 PM",
-      status: "pending",
-      points: 100,
-      aiComment: "High Occurrence in tests",
-    },
+    /* Stoichiometry Problem Set removed */
     {
       id: 2,
       title: "Chemistry Midterm Exam",
@@ -70,17 +61,15 @@ const coursePageData = {
       dueTime: "10:00 AM",
       status: "upcoming",
       points: 200,
-      aiComment: "Time Consuming",
     },
     {
       id: 3,
-      title: "Atomic Structure Quiz",
-      type: "quiz",
-      dueDate: "2024-03-20",
-      dueTime: "2:00 PM",
+      title: "Redox Reactions Assignment",
+      type: "assignment",
+      dueDate: "2024-03-25",
+      dueTime: "11:59 PM",
       status: "upcoming",
-      points: 50,
-      aiComment: "Practice Recommended",
+      points: 80,
     },
   ],
   modulesByTopic: [
@@ -152,7 +141,7 @@ const coursePageData = {
       status: "in-progress",
       description: "Mole concept, balancing equations, and yield calculations in chemical reactions.",
       materials: ["Lecture Notes 3-4", "Stoichiometry Guide", "Limiting Reagent Tutorial"],
-      assignments: ["Stoichiometry Problem Set", "Lab Report: Reaction Yield"],
+      assignments: ["Lab Report: Reaction Yield"],
     },
     {
       id: 3,
@@ -257,7 +246,7 @@ const coursePageData = {
   grades: {
     overall: 0, // Will be calculated
     breakdown: [
-      { assignment: "Stoichiometry Problem Set", score: 95, total: 100, weight: "10%" },
+      /* Stoichiometry Problem Set grade removed */
       { assignment: "Atomic Structure Homework", score: 88, total: 100, weight: "10%" },
       { assignment: "Quiz: Chemical Bonding", score: 42, total: 50, weight: "5%" },
       { assignment: "Gas Laws Worksheet", score: 92, total: 100, weight: "10%" },
@@ -376,40 +365,40 @@ export default function CoursePage() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                  {coursePageData.upcomingTasks.map((task) => (
-                    <div key={task.id} className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
-                      <div className={`w-3 h-3 rounded-full ${getTaskTypeColor(task.type)}`} />
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2">
-                          <Link href={`/task/${task.id}`} className="hover:underline">
-                            <span className="font-medium text-card-foreground cursor-pointer">{task.title}</span>
-                          </Link>
-                          <Badge variant="outline" className="text-xs capitalize">
-                            {task.type}
-                          </Badge>
-                          <Badge variant="secondary" className="text-xs">
-                            {task.points} pts
-                          </Badge>
-                          {task.aiComment && (
-                            <div className="flex items-center gap-1 px-2 py-1 bg-purple-100 dark:bg-purple-900/30 rounded-full">
-                              <Sparkles className="w-3 h-3 text-purple-600 dark:text-purple-400" />
-                              <span className="text-xs text-purple-700 dark:text-purple-300">{task.aiComment}</span>
-                            </div>
-                          )}
+                  {coursePageData.upcomingTasks.map((task) => {
+                    const assignment = getDummyTaskById(task.id)
+                    return (
+                      <div key={task.id} className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+                        <div className={`w-3 h-3 rounded-full ${getTaskTypeColor(task.type)}`} />
+                        <div className="flex-1">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <Link href={`/task/${task.id}`} className="hover:underline">
+                              <span className="font-medium text-card-foreground cursor-pointer">{task.title}</span>
+                            </Link>
+                            <Badge variant="outline" className="text-xs capitalize">
+                              {task.type}
+                            </Badge>
+                            <Badge variant="secondary" className="text-xs">
+                              {task.points} pts
+                            </Badge>
+                            {assignment?.description && (
+                              <AiCommentChip taskId={task.id} assignmentText={assignment.description} />
+                            )}
+                          </div>
+                          <p className="text-sm text-muted-foreground">
+                            Due: {new Date(task.dueDate).toLocaleDateString()} at {task.dueTime}
+                          </p>
                         </div>
-                        <p className="text-sm text-muted-foreground">
-                          Due: {new Date(task.dueDate).toLocaleDateString()} at {task.dueTime}
-                        </p>
+                        {task.status === "completed" ? (
+                          <CheckCircle className="w-5 h-5 text-green-500" />
+                        ) : (
+                          <Link href={`/task/${task.id}#submission`}>
+                            <Upload className="w-5 h-5 text-blue-500 cursor-pointer hover:text-blue-600" />
+                          </Link>
+                        )}
                       </div>
-                      {task.status === "completed" ? (
-                        <CheckCircle className="w-5 h-5 text-green-500" />
-                      ) : (
-                        <Link href={`/task/${task.id}#submission`}>
-                          <Upload className="w-5 h-5 text-blue-500 cursor-pointer hover:text-blue-600" />
-                        </Link>
-                      )}
-                    </div>
-                  ))}
+                    )
+                  })}
                 </CardContent>
               </Card>
 
